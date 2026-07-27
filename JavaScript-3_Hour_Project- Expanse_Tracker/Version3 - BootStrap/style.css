@@ -1,0 +1,9 @@
+body {
+  font-family: Arial, sans-serif;
+}
+.card {
+  border-radius: 16px;
+}
+.btn i {
+  pointer-events: none;
+}

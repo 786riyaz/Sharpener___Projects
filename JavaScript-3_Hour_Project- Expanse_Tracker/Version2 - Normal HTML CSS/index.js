@@ -1,0 +1,121 @@
+let amount = document.getElementById("amount");
+let desc = document.getElementById("desc");
+let category = document.getElementById("category");
+let datetime = document.getElementById("datetime");
+let table = document.getElementById("table");
+let submitBtn = document.getElementById("submitButton");
+datetime.value = new Date().toISOString().slice(0, 16);
+
+updateTable();
+
+function addExpanse(event) {
+  event.preventDefault();
+  console.log("Adding...");
+  console.log(parseInt(amount.value));
+  console.log(desc.value);
+  console.log(category.value);
+  console.log(datetime.value);
+  let thisRecord = {
+    amount: parseInt(amount.value),
+    desc: desc.value,
+    category: category.value,
+  };
+
+  let data = localStorage.getItem("expanseData");
+  console.log(data);
+  if (!data) {
+    data = {};
+  } else {
+    data = JSON.parse(data);
+  }
+  data[datetime.value] = thisRecord;
+  console.log("Updated Data ::", data);
+  localStorage.setItem("expanseData", JSON.stringify(data));
+  window.location.reload();
+}
+
+function updateTable() {
+  let total = 0;
+  console.log("Creating Table");
+  let data = localStorage.getItem("expanseData");
+  if (!data) {
+    data = {};
+  } else {
+    data = JSON.parse(data);
+  }
+  for (let record in data) {
+    let amountCell = document.createElement("td");
+    amountCell.innerText = data[record].amount;
+    total += data[record].amount;
+    let descCell = document.createElement("td");
+    descCell.innerText = data[record].desc;
+    let categoryCell = document.createElement("td");
+    categoryCell.innerText = data[record].category;
+    let deleteButton = document.createElement("button");
+    deleteButton.innerText = "Delete";
+    deleteButton.id = "delete-" + record;
+    deleteButton.addEventListener("click", deleteRecord);
+    let editButton = document.createElement("button");
+    editButton.innerText = "Edit";
+    editButton.id = "edit-" + record;
+    editButton.addEventListener("click", editRecord);
+
+    let newRow = document.createElement("tr");
+    newRow.appendChild(amountCell);
+    newRow.appendChild(descCell);
+    newRow.appendChild(categoryCell);
+
+    let actionCell = document.createElement("td");
+    actionCell.appendChild(editButton);
+    actionCell.appendChild(deleteButton);
+    newRow.appendChild(actionCell);
+
+    table.appendChild(newRow);
+  }
+  console.log("Total ::", total);
+
+  let newRow = document.createElement("tr");
+  newRow.id="totalRow";
+  let totalCell = document.createElement("td");
+  totalCell.colSpan = 4;
+  newRow.appendChild(totalCell);
+
+  totalCell.innerText = "Total ::::: " + total;
+
+  table.appendChild(newRow);
+}
+
+function deleteRecord(event) {
+  let id = event.target.id.replace("delete-", "");
+  let data = localStorage.getItem("expanseData");
+  if (!data) {
+    data = {};
+  } else {
+    data = JSON.parse(data);
+  }
+  console.log("ID ::", id);
+  console.log("Record to Delete ::", data[id]);
+  delete data[id];
+  console.log("Updated Data ::", data);
+  localStorage.setItem("expanseData", JSON.stringify(data));
+  window.location.reload();
+}
+
+function editRecord(event) {
+  let id = event.target.id.replace("edit-", "");
+  let data = localStorage.getItem("expanseData");
+  if (!data) {
+    data = {};
+  } else {
+    data = JSON.parse(data);
+  }
+
+  console.log("ID ::", id);
+  console.log("Record to Edit ::", data[id]);
+
+  datetime.value = id;
+  amount.value = data[id].amount;
+  desc.value = data[id].desc;
+  category.value = data[id].category;
+  submitBtn.innerText = "Update Expanse";
+}

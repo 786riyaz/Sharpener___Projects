@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expanse Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <form onsubmit="addExpanse(event)">
+        <input type="datetime-local" name="datetime" id="datetime" style="display: none;">
+        <h1>Expanse Tracker</h1>
+        <table>
+            <tr>
+                <td>
+                    <label for="amount">
+                        Enter Expanse Amount ::
+                    </label>
+                </td>
+                <td>
+                    <input type="number" name="amount" id="amount" required>
+                </td>
+            </tr>
+            <tr>
+                <td> <label for="desc">
+                        Choose Description ::
+                    </label></td>
+                <td>
+                    <input type="text" name="desc" id="desc">
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="category">
+                        Choose Category ::
+                    </label>
+                </td>
+                <td>
+                    <select name="category" id="category" required>
+                        <option value="Fuel">Fuel</option>
+                        <option value="Food">Food</option>
+                        <option value="Utility">Utility</option>
+                        <option value="Medical">Medical</option>
+                        <option value="Study">Study</option>
+                        <option value="Travel">Travel</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" id="buttonCell">
+                    <button type="submit" id="submitButton">Add Expanse</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <br>
+    <table id="table">
+        <tr>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Action</th>
+        </tr>
+    </table>
+</body>
+<script src="index.js"></script>
+
+</html>

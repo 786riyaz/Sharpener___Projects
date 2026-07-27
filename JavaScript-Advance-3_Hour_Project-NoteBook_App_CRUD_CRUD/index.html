@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notebook App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>📒 Notebook</h1>
+                <p>Keep your thoughts organized.</p>
+            </div>
+            <div class="search-section">
+                <label for="searchBox">
+                    Search Notes
+                </label>
+                <input type="text" id="searchBox" placeholder="Search by title...">
+                <div class="counter">
+                    <span>
+                        Total Notes :
+                        <strong id="totalNotes">0</strong>
+                    </span>
+                    <span>
+                        Showing :
+                        <strong id="showingNotes">0</strong>
+                    </span>
+                </div>
+            </div>
+        </header>
+        
+        <section class="note-form">
+            <h2>Create New Note</h2>
+            <form id="noteForm" onsubmit="handleFormSubmit(event)">
+                <label for="title">
+                    Note Title
+                </label>
+                <input type="text" id="title" placeholder="Enter note title" required>
+                <label for="description">
+                    Description
+                </label>
+                <textarea id="description" rows="6" placeholder="Write your note here..." required></textarea>
+                <button type="submit">
+                    ➕ Add Note
+                </button>
+            </form>
+        </section>
+        
+        <section class="notes-section">
+            <h2>My Notes</h2>
+            <div id="notesContainer" class="notes-grid">
+            </div>
+        </section>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
