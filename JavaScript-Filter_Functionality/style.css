@@ -1,0 +1,80 @@
+#header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid gray;
+}
+
+#header input {
+  width: 30%;
+  border: 2px solid gray;
+  border-radius: 5px;
+}
+
+h2 {
+  margin: 0;
+}
+
+form {
+  margin: 30px;
+  width: 100%;
+}
+
+form input {
+  height: 35px;
+  width: 40%;
+  border: 2px solid yellowgreen;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+form button {
+  height: 40px;
+  width: 10%;
+  border: none;
+  border-radius: 5px;
+  margin-top: 5px;
+  margin-left: 5px;
+  background-color: yellowgreen;
+}
+
+ul {
+  list-style-type: none;
+  background-color: pink;
+  padding: 5px;
+  margin: 0 30px;
+  width: 50%;
+  border-radius: 5px;
+}
+
+li {
+  font-size: 20px;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+  background-color: lightyellow;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.delete-btn {
+  align-self: flex-end;
+  background-color: tomato;
+  border: none;
+  border-radius: 2px;
+  padding: 5px 18px;
+}
+
+.edit-btn {
+  align-self: flex-end;
+  background-color: lightblue;
+  border: none;
+  border-radius: 2px;
+  padding: 5px 10px;
+  margin-top: 5px;
+}
+
+p {
+  margin: 0;
+  font-size: 15px;
+}
