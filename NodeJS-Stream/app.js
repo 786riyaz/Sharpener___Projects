@@ -43,7 +43,21 @@ const server = http.createServer((req, res) => {
         res.end();
       });
     });
-  } else {
+  } else if(url.pathname === "/read"){
+    fs.readFile("messages.txt", "utf8", (err, data) => {
+      if (err) {
+        res.writeHead(500);
+        return res.end("Error reading file");
+      }
+      res.writeHead(200, {
+        "Content-Type": "text/html"
+      });
+      res.end(`<h1>Messages</h1><p>${data}</p>`);
+    });
+  }
+  
+  
+  else {
     res.writeHead(404, {
       "Content-Type": "text/html",
     });
