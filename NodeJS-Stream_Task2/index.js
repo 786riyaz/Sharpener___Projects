@@ -25,27 +25,50 @@ const server = http.createServer((req, res) => {
     }
     else if (req.url === "/addMessage" && req.method === "POST") {
 
-        let body = "";
+        // Store incoming Buffer chunks
+        const chunks = [];
 
-        req.on("data", chunk => {
-            body += chunk;
+        req.on("data", (chunk) => {
+
+            console.log("Received Chunk:", chunk);
+            console.log("Is Buffer:", Buffer.isBuffer(chunk));
+            console.log("Chunk Size:", chunk.length, "bytes");
+
+            chunks.push(chunk);
+
         });
 
         req.on("end", () => {
 
+            // Merge all buffers into one
+            const fullBuffer = Buffer.concat(chunks);
+
+            console.log("\nComplete Buffer:");
+            console.log(fullBuffer);
+
+            // Convert Buffer to String
+            const body = fullBuffer.toString();
+
+            console.log("\nBody String:");
+            console.log(body);
+
+            // Parse form data
             const params = new URLSearchParams(body);
             const msg = params.get("message");
 
-            fs.writeFile("messages.txt", msg, err => {
+            fs.writeFile("messages.txt", msg, (err) => {
 
                 if (err) {
                     res.statusCode = 500;
                     return res.end("Error");
                 }
 
-                res.statusCode = 302;
-                res.setHeader("Location", "/");
+                res.writeHead(302, {
+                    "Location": "/"
+                });
+
                 res.end();
+
             });
 
         });
@@ -53,11 +76,16 @@ const server = http.createServer((req, res) => {
     }
     else {
 
-        res.statusCode = 404;
+        res.writeHead(404, {
+            "Content-Type": "text/plain"
+        });
+
         res.end("Not Found");
 
     }
 
 });
 
-server.listen(3000);
+server.listen(3000, () => {
+    console.log("Server running at http://localhost:3000");
+});
