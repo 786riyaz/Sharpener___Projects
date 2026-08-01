@@ -937,9 +937,7 @@ Axios
 
 Users need these.
 
-These are
-
-Production Dependencies.
+These are Production Dependencies.
 
 ---
 
