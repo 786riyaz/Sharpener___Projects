@@ -8,6 +8,8 @@ import express from 'express';
 
 const app = express();
 
+app.use(loggingMiddleware);
+
 app.get('/products', (req, res) => {
   res.send('Here is the list of all products.');
 });
@@ -32,3 +34,8 @@ app.use((req, res) => {
 app.listen(4000, () => {
   console.log('Server is running on port 4000');
 });
+
+function loggingMiddleware(req, res, next) {
+  console.log(`${req.method} request made to ${req.url}`);
+  next();
+}
