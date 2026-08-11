@@ -1,0 +1,2 @@
+Controllers are to separate the business logic from route logic.
+we have to create controller folder.
