@@ -8,7 +8,7 @@ const serveFile = (req, res) => {
   
   // This will work because we are using path.resolve() to get the absolute path of the file.
   // res.sendFile('products.html', { root: 'views' });
-  res.sendFile(path.resolve('views', 'products.html'));
+  res.sendFile(path.resolve('VIEW', 'products.html'));
 }
 
 export { serveFile };
