@@ -6,9 +6,9 @@ import cartRoutes from "./routes/cartRoutes.js";
 
 const app = express();
 
-app.use("/api/products", productRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/cart", cartRoutes);
+app.use("/products", productRoutes);
+app.use("/users", userRoutes);
+app.use("/cart", cartRoutes);
 
 app.get("/", (req, res) => {
   res.send("E Commerce Home Page!");

@@ -1,9 +1,9 @@
 import express from "express";
-import { getCartByUserId, addProductToCart } from "../controllers/cartController.js";
+import { getCartForUser, addProductToCart } from "../controllers/cartController.js";
 const router = express.Router();
 
 
-router.get("/:userId",  getCartByUserId);
+router.get("/:userId",  getCartForUser);
 
 router.post("/:userId",  addProductToCart);
 

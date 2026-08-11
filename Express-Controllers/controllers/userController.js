@@ -1,4 +1,4 @@
-const getUsers = (req, res) => {
+const getAllUsers = (req, res) => {
   res.send("Fetching all users");
 };
 
@@ -11,4 +11,4 @@ const addUser = (req, res) => {
   res.send("Adding a new user");
 };
 
-export { getUsers, getUserById, addUser };
+export { getAllUsers, getUserById, addUser };

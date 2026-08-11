@@ -1,10 +1,10 @@
 import express from "express";
-import { getUsers, getUserById, addUser } from "../controllers/userController.js";
+import { getAllUsers, getUserById, addUser } from "../controllers/userController.js";
 import authController from "../controllers/authController.js";
 
 const router = express.Router();
 
-router.get("/", authController.login, getUsers);
+router.get("/", authController.login, getAllUsers);
 
 router.get("/:id", authController.login, getUserById);
 
