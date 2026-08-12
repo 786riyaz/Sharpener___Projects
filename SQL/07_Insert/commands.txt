@@ -1,0 +1,23 @@
+INSERT INTO table (col1, col2)
+VALUES (val1, val2);
+
+INSERT INTO table 
+VALUES (val1, val2);
+
+INSERT INTO Books (Title, Author, Language)
+VALUES ("Gitanjali", "Rabindranath Tagore", "Bengali");
+
+INSERT INTO Books
+VALUES ("Great Expectations", "Charles Dickens", "English");
+
+INSERT INTO Books (Title, Author, Language)
+VALUES 
+("Gitanjali", "Rabindranath Tagore", "Bengali"),
+("Great Expectations", "Charles Dickens", "English");
+
+INSERT INTO Books 
+VALUES 
+("Gitanjali", "Rabindranath Tagore", "Bengali"),
+("Great Expectations", "Charles Dickens", "English"),
+("HArry Potter", "J.K. Rowling", "English")
+

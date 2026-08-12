@@ -1,0 +1,11 @@
+SELECT table1.col1, table2.col2
+FROM table1
+JOIN table2
+on table1.col3 = table2.col3;
+
+SELECT * FROM Employees;
+SELECT * FROM departments;
+SELECT Employees.name, Employees.salary, departments.department_name
+FROM Employees
+JOIN departments
+on Employees.department_id = departments.department_id;

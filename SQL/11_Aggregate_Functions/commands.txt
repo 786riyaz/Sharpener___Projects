@@ -1,0 +1,10 @@
+SELECT SUM(salary) AS TotalSalary FROM Employees;
+
+SELECT avg(Salary) AS AverageSalary FROM Employees;
+
+SELECT max(salary) AS HighestSalary, min(salary) AS LowestSalary FROM employees;
+
+SELECT Name
+FROM Employees
+WHERE Salary = (Select min(Salary) FROM Employees) ;
+

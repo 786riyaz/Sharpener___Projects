@@ -1,0 +1,15 @@
+Select Col1, col2
+FROM table
+ORDER BY col2
+LIMIT N;
+
+Select name, marks
+FROM Students
+ORDER BY marks DESC
+LIMIT 3;
+
+SELECT * 
+FROM products
+LIMIT 5
+OFFSET 1*5;
+OFFSET 5;

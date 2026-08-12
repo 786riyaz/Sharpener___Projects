@@ -1,0 +1,10 @@
+SELECT e1.Employee_ID, e1.Employee_Name AS Employee_Name, e2.name as Manager_Name
+FROM employees r1
+LEFT JOIN employees r2
+on e1.manager_id = e1.employee_id;
+
+SELECT g1.name AS Guest1Name, g2.name AS Guest2Name, g1.Contact AS Contact
+FROM Guests g1
+JOIN Guests g2
+ON g1.GuestID < g2.GuestID
+AND g1.Contact = g2.contact;

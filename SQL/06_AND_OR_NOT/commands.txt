@@ -1,0 +1,17 @@
+SELECT col1, col2
+FROM tablename
+Where condition1 AND|OR condition2;
+
+SELECT *
+FROM Products
+WHERE category="Electronics" AND price > 10000;
+
+SELECT emp_id, emp_name, department, salary, joining_date
+FROM Employees
+WHERE NOT department = "HR"
+  AND NOT salary < 50000;
+
+SELECT emp_id, emp_name, department, salary, joining_date
+FROM Employees
+WHERE department <> 'HR'
+  AND salary >= 50000;

@@ -1,0 +1,12 @@
+UPDATE table
+SET ColumnName = value
+WHERE ColumnName = value;
+
+UPDATE Books
+SET Language = "Hindi"
+WHERE Title = "Gitanjali";
+
+
+UPDATE employees
+SET salary = 75000, department = "Senior Finance"
+WHERE id = 104;

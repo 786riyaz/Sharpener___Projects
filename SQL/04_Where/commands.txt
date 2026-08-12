@@ -1,0 +1,23 @@
+SELECT col1, col2
+FROM table
+WHERE condition;
+
+SELECT *
+FROM Books
+WHERE Author="Jane Austen";
+
+SELECT Title, Genre, YearPublished
+FROM Books
+WHERE Author="Jane Austen";
+
+SELECT * 
+FROM Books
+WHERE YearPublished = '1950';
+
+SELECT Titel, Author
+FROM Books
+WHERE YearPublished = '1950';
+
+SELECT Titel, Author
+FROM Books
+WHERE YearPublished > 1950;

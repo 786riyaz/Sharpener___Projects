@@ -1,0 +1,11 @@
+SELECT column1, column2 FROM tablename;
+
+SELECT Title, Author, YearPublished
+FROM Books;
+
+SELECT *
+FROM Books;
+
+SELECT DISTINCT YearPublished
+FROM Books;
+

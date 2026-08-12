@@ -1,0 +1,23 @@
+MYSQL Server Do not Support FULL OUTER Join. Instead it provides UNION for that.
+MS SQL Server supports FULL OUTER JOIN.
+====================================================
+Select cols
+FROM Table1
+FULL OUTER JOIN Table2
+ON Table1.col1 = Table2.col2;
+
+Select Customer.CustomerID, Customer.Name, Customer.Age, Orders.OrderID,Orders.Product,Orders.Amount,Orders.Status 
+FROM Customers
+FULL OUTER JOIN Orders
+ON Customers.CustomerID = Orders.CustomerID;
+
+====================================================
+Select Customer.CustomerID, Customer.Name, Customer.Age, Orders.OrderID,Orders.Product,Orders.Amount,Orders.Status 
+FROM Customers
+LEFT JOIN Orders
+ON Customers.CustomerID = Orders.CustomerID;
+UNION
+Select Customer.CustomerID, Customer.Name, Customer.Age, Orders.OrderID,Orders.Product,Orders.Amount,Orders.Status 
+FROM Customers
+RIGHT JOIN Orders
+ON Customers.CustomerID = Orders.CustomerID;

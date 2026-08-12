@@ -1,0 +1,21 @@
+Select cols
+FROM Table1
+LEFT JOIN Table2
+ON Table1.col1 = Table2.col2;
+
+Select Customer.CustomerID, Customer.Name, Customer.Age, Orders.OrderID,Orders.Product,Orders.Amount,Orders.Status 
+FROM Customers
+LEFT JOIN Orders
+ON Customers.CustomerID = Orders.CustomerID;
+
+SELECT Guests.Name AS GuestName, Rooms.RoomType AS RoomType
+FROM Guests
+LEFT JOIN Reservations
+ON Guests.GuestID = Reservations.GuestID
+LEFT JOIN Rooms
+ON Reservations.RoomID = Rooms.RoomID;
+Your Output
+GuestName	RoomType
+John Doe	Double
+Mary Jane	Suite
+James Smith Null

@@ -1,0 +1,18 @@
+SELECT col1, col2
+FROM table
+ORDER BY col1 ASC|DESC;
+
+
+SELECT *
+FROM Books
+ORDER BY Author;
+
+
+SELECT Title
+FROM Books
+ORDER BY YearPublished DESC;
+
+
+SELECT Title
+FROM Books
+ORDER BY YearPublished, Author DESC;

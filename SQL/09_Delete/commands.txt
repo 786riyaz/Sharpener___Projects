@@ -1,0 +1,6 @@
+DELETE FROM Table
+WHERE condition;
+WHERE columnName <,=,> value;
+
+DELETE FROM Books
+WHERE Title = "Harry Potter";

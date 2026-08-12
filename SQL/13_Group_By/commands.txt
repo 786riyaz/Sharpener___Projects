@@ -1,0 +1,12 @@
+SELECT Author, COUNT(*)
+FROM Books
+GROUP BY Author;
+
+SELECT Author, COUNT(*), AVG(PublicationYear)
+FROM Books
+GROUP BY Author;
+
+SELECT Author, COUNT(*)
+FROM Books
+GROUP BY Author
+HAVING COUNT(*) > 1;

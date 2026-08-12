@@ -1,0 +1,9 @@
+Select cols
+FROM Table1
+RIGHT JOIN Table2
+ON Table1.col1 = Table2.col2;
+
+Select Customer.CustomerID, Customer.Name, Customer.Age, Orders.OrderID,Orders.Product,Orders.Amount,Orders.Status 
+FROM Customers
+RIGHT JOIN Orders
+ON Customers.CustomerID = Orders.CustomerID;

@@ -1,0 +1,25 @@
+CREATE TABLE student (
+    studentID INT,
+    FirstName VARCHAR(255),
+    LastName VARCHAR(255),
+    classID int; 
+);
+
+CREATE TABLE class (
+    classID INT PRIMARY KEY,
+    className varchar(20);
+);
+
+FirstName VARCHAR(255) NOT NULL
+LastName VARCHAR(255) NOT NULL
+
+studentID INT PRIMARY KEY
+
+FOREIGN KEY(classID) REFERENCES class(classID)
+
+CREATE TABLE Student (
+    FirstName VARCHAR(255) NOT NULL,
+    LastName VARCHAR(255) NOT NULL,
+    studentID INT PRIMARY KEY,
+    FOREIGN KEY(classID) REFERENCES class(classID)
+);

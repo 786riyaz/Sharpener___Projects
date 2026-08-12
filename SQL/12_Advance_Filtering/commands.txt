@@ -1,0 +1,36 @@
+SELECT col1 FROM Table
+WHERE col1 LIKE '%pattern%';
+
+SELECT * FROM Books
+WHERE Title LIKE '%JavaScript%';
+
+SELECT * FROM Books
+WHERE Title LIKE 'The %';
+
+SELECT * FROM Books
+WHERE Title LIKE '%s';
+
+SELECT * FROM Books
+WHERE Title LIKE '%s% ';
+
+SELECT * FROM Books
+WHERE Author LIKE "J___ %";
+SELECT * FROM Books
+WHERE Author LIKE "J__N %";
+======================================
+
+SELECT col1 FROM Table
+WHERE col1 IN (values);
+
+SELECT * FROM Books
+WHERE Author IN ("Jane Smith", "Alice Johnson", "Michael Harris");
+
+======================================
+
+SELECT col1, col2, col3 FROM Table
+WHERE col1 BETWEEN val1 AND val2;
+
+SELECT * FROM Books
+WHERE publicationYear BETWEEN 2015 AND 2025;
+
+======================================
