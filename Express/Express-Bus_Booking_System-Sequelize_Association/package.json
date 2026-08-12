@@ -1,0 +1,26 @@
+{
+  "name": "gsrtc-bus-booking-associations",
+  "version": "1.0.0",
+  "description": "GSRTC Bus Booking API using Express, Sequelize, MySQL and model associations",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "sequelize",
+    "mysql",
+    "associations"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mysql2": "^3.23.3",
+    "nodemon": "^3.1.14",
+    "sequelize": "^6.37.8"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "info": {
+    "name": "GSRTC Associations API",
+    "description": "Postman examples for the Sequelize associations assignment.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users",
+          "host": ["{{baseUrl}}"],
+          "path": ["users"]
+        }
+      }
+    },
+    {
+      "name": "Create Bus",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"busNumber\": \"MH12AB1234\",\n  \"totalSeats\": 40,\n  \"availableSeats\": 30\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/buses",
+          "host": ["{{baseUrl}}"],
+          "path": ["buses"]
+        }
+      }
+    },
+    {
+      "name": "Create Booking",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": 1,\n  \"busId\": 1,\n  \"seatNumber\": 10\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/bookings",
+          "host": ["{{baseUrl}}"],
+          "path": ["bookings"]
+        }
+      }
+    },
+    {
+      "name": "Get User Bookings With Bus",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/users/1/bookings",
+          "host": ["{{baseUrl}}"],
+          "path": ["users", "1", "bookings"]
+        }
+      }
+    },
+    {
+      "name": "Get Bus Bookings With User",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/buses/1/bookings",
+          "host": ["{{baseUrl}}"],
+          "path": ["buses", "1", "bookings"]
+        }
+      }
+    }
+  ]
+}
