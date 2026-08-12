@@ -1,0 +1,264 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  min-height: 100vh;
+  color: #f8fafc;
+  padding: 20px;
+}
+
+/* ==========================
+   CONTAINER
+========================== */
+.container {
+  width: 95%;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* ==========================
+   HEADER
+========================== */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.logo h1 {
+  font-size: 42px;
+  color: #38bdf8;
+  margin-bottom: 8px;
+}
+
+.logo p {
+  color: #cbd5e1;
+  font-size: 16px;
+}
+
+/* ==========================
+   SEARCH PANEL
+========================== */
+.search-section {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 15px;
+  padding: 25px;
+  min-width: 350px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.search-section label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.search-section input {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  background: #334155;
+  color: white;
+  font-size: 15px;
+}
+
+.search-section input::placeholder {
+  color: #94a3b8;
+}
+
+.counter {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.counter strong {
+  color: #38bdf8;
+}
+
+/* ==========================
+   FORM
+========================== */
+.note-form {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.note-form h2 {
+  color: #38bdf8;
+  margin-bottom: 10px;
+}
+
+.note-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.note-form input,
+.note-form textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 10px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  background: #334155;
+  color: white;
+  font-size: 16px;
+}
+
+.note-form textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+.note-form input::placeholder,
+.note-form textarea::placeholder {
+  color: #94a3b8;
+}
+
+.note-form button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background: #0ea5e9;
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.note-form button:hover {
+  background: #0284c7;
+  transform: translateY(-2px);
+}
+
+/* ==========================
+   NOTES
+========================== */
+.notes-section h2 {
+  color: #38bdf8;
+  margin-bottom: 10px;
+}
+
+/* ==========================
+   GRID
+========================== */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+}
+
+/* ==========================
+   NOTE CARD
+========================== */
+.note-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 15px;
+  padding: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  transition: 0.3s;
+  border-top: 5px solid #38bdf8;
+}
+
+.note-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+}
+
+.note-card h3 {
+  color: #38bdf8;
+  margin-bottom: 5px;
+  font-size: 24px;
+  word-break: break-word;
+}
+
+.note-card p {
+  color: #e2e8f0;
+  line-height: 1.7;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 90px;
+}
+
+/* ==========================
+   DELETE BUTTON
+========================== */
+.note-card button {
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ef4444;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.note-card button:hover {
+  background: #dc2626;
+}
+
+/* ==========================
+   EMPTY MESSAGE
+========================== */
+.empty-message {
+  grid-column: 1/-1;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 15px;
+  padding: 80px 20px;
+}
+
+.empty-message h2 {
+  color: #38bdf8;
+  margin-bottom: 10px;
+}
+
+.empty-message p {
+  color: #cbd5e1;
+}
+
+/* ==========================
+   SCROLLBAR
+========================== */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #38bdf8;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0ea5e9;
+}
