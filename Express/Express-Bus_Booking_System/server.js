@@ -19,7 +19,7 @@ connection.connect((err) => {
   console.log("Connection has been created!");
 
   const createUsersTable = `
-  CREATE TABLE Users (
+  CREATE TABLE IF NOT EXISTS Users (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(40),
     Email VARCHAR(40)
@@ -27,7 +27,7 @@ connection.connect((err) => {
 `;
 
 const createBusesTable = `
-  CREATE TABLE Buses (
+  CREATE TABLE IF NOT EXISTS Buses (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     BusNumber VARCHAR(40),
     TotalSeats INT,
@@ -36,14 +36,14 @@ const createBusesTable = `
 `;
 
 const createBookingsTable = `
-  CREATE TABLE Bookings (
+  CREATE TABLE IF NOT EXISTS Bookings (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     SeatNumber INT
   )
 `;
 
 const createPaymentsTable = `
-  CREATE TABLE Payments (
+  CREATE TABLE IF NOT EXISTS Payments (
     Id INT AUTO_INCREMENT PRIMARY KEY,
     AmountPaid INT,
     PaymentStatus VARCHAR(10)
