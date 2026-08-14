@@ -1,17 +1,27 @@
 {
-  "name": "student_attandance_express",
+  "name": "attendance-system",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Student Attendance Management System built with Express, Sequelize, MySQL and Axios",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node seeders/seedStudents.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["attendance", "express", "sequelize", "mysql", "axios"],
+  "author": "AIM Enterprise",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1",
-    "mysql2": "^3.23.3",
-    "sequelize": "^6.37.8"
+    "axios": "^1.7.7",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "mysql2": "^3.11.4",
+    "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }
