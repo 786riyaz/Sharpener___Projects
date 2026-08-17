@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Attendance</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+
+    <!-- =========================
+         Header
+    ========================== -->
+
+    <header class="header">
+
+        <h1 id="main-heading">
+            Student Attendance Page
+        </h1>
+
+        <button onclick="toggleTheme()" id="theme-button">
+            Light Theme
+        </button>
+
+    </header>
+
+
+    <!-- =========================
+         Search Controls
+    ========================== -->
+
+    <section class="attendance-controls">
+
+        <div class="date-controls">
+
+            <label for="date" id="date-label">
+                Select Date:
+            </label>
+
+            <input type="date" id="date" name="date">
+
+            <button onclick="getAttandance()" id="search-button">
+                Search
+            </button>
+
+        </div>
+
+
+        <button onclick="getTotalData()" id="fetch-button">
+            Fetch Attendance Report
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         Student Data
+    ========================== -->
+
+    <main id="student-list">
+
+        <div id="notice">
+            Pick a date and click Search to view or mark attendance.
+        </div>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
