@@ -1,3 +1,4 @@
+// public/script.js
 let userRegistrationMsg = document.getElementById("user-registration-msg");
 
 function handleFormSubmit(event) {
@@ -22,21 +23,20 @@ function handleFormSubmit(event) {
     },
     body: JSON.stringify(data),
   })
-    .then((response) => {
-      console.log(response);
+    .then(async (response) => {
+      const message = await response.text();
 
       if (response.ok) {
         userRegistrationMsg.style.display = "block";
+        userRegistrationMsg.innerText = message;
 
         setTimeout(() => {
           window.location.href = "/";
         }, 2000);
+      } else {
+        userRegistrationMsg.style.display = "block";
+        userRegistrationMsg.innerText = message;
       }
-
-      return response.text();
-    })
-    .then((message) => {
-      console.log("Server Response ::", message);
     })
     .catch((error) => {
       console.error("Registration failed:", error);
