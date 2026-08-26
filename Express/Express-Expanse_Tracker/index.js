@@ -59,17 +59,19 @@ app.post("/user/login", async (req, res) => {
     });
     if (!user) {
       // No account with that e‑mail
-      return res.status(401).json({ error: "Invalid credentials." });
+      // return res.status(401).json({ error: "Invalid credentials." });
+      return res.status(404).send("User Not Found");
     }
 
     if (user.password != password) {
-      return res.status(401).json({ error: "Invalid credentials." });
+      // return res.status(401).json({ error: "Invalid credentials." });
+      return res.status(401).send("Invalid credentials.");
     }
-
-    res.status(200).json({
-      message: "Login successful",
-      user: { id: user.id, email: user.email },
-    });
+    res.status(200).send("User Login Successfull.");
+    // res.status(200).json({
+    //   message: "Login successful",
+    //   user: { id: user.id, email: user.email },
+    // });
   } catch (error) {
     console.error("Login error:", err);
     res.status(500).json({ error: "An unexpected error occurred." });
