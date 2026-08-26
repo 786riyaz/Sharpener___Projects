@@ -21,12 +21,48 @@
         </label>
         <br>
         <button type="submit">Login</button>
+        <h1 id="user-registration-msg" style="display: none;">User Login Successfull!</h1>
 
     </form>
     <a href="/register.html">
         New User ?
     </a>
-</body>
-<script src="/script.js"></script>
+    <script>
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
 
+            const data = {
+                email: formData.get("email"),
+                password: formData.get("password")
+            }
+            console.log(data);
+
+            fetch("/user/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }).then(async (response) => {
+                const message = await response.text();
+
+                if (response.ok) {
+                    userRegistrationMsg.style.display = "block";
+                    userRegistrationMsg.innerText = message;
+
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 2000);
+                } else {
+                    userRegistrationMsg.style.display = "block";
+                    userRegistrationMsg.innerText = message;
+                }
+            }).catch((error) => {
+                console.error("Registration failed :".error);
+            });
+        }
+    </script>
+</body>
 </html>
