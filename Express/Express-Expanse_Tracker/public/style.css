@@ -1,0 +1,146 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: black;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+form {
+  width: 310px;
+  margin: 30px auto;
+  padding: 30px;
+
+  border: 4px solid #777;
+  border-radius: 15px;
+
+  background-color: #111;
+}
+
+input {
+  display: block;
+  width: 100%;
+  height: 40px;
+
+  margin-top: 5px;
+  padding: 0 10px;
+
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+
+  color: white;
+  background-color: #222;
+
+  border: none;
+  border-bottom: 3px solid #777;
+
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-bottom-color: limegreen;
+}
+
+label {
+  display: block;
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+h1 {
+  text-align: center;
+  margin: 20px 0;
+}
+
+button {
+  display: block;
+  align-items: center;
+  margin: auto;
+  padding: 2px 20px;
+  border: 5px solid gray;
+  border-radius: 7px;
+}
+
+.password-container {
+  position: relative;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.password-container input {
+  width: 100%;
+  margin-top: 0;
+  padding-right: 45px;
+}
+
+/* Eye button */
+#toggle-password {
+  position: absolute;
+
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 30px;
+  height: 30px;
+
+  padding: 0;
+  margin: 0;
+
+  border: none;
+  background: transparent;
+
+  font-size: 18px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Don't apply normal button styling to eye button */
+#toggle-password:hover {
+  background: transparent;
+  border: none;
+}
+
+/* Login button */
+form > button {
+  display: block;
+  margin: 10px auto 15px;
+  padding: 6px 25px;
+
+  color: white;
+  background-color: #111;
+
+  border: 4px solid #777;
+  border-radius: 8px;
+
+  font-size: 16px;
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+form > button:hover {
+  border-color: limegreen;
+  color: limegreen;
+}
+
+a {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  color: white;
+}
+
+a:hover {
+  color: limegreen;
+}

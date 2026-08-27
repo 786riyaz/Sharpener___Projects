@@ -6,38 +6,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <h1>User Registration</h1>
     <form onSubmit="handleFormSubmit(event)">
         <label for="name">
-            Name ::
+            Name
             <input type="text" name="name" id="name">
         </label>
         <br>
         <label for="email">
-            Email ID ::
+            Email ID
             <input type="email" name="email" id="email">
         </label>
         <br>
         <label for="password">
-            Password ::
-            <input type="password" name="password" id="password">
+            Password
+            <input type="text" name="password" id="password">
         </label>
         <br>
         <label for="confirm-password">
-            Confirm Password ::
+            Confirm Password
             <input type="password" name="confirm-password" id="confirm-password">
         </label>
         <br>
         <button type="submit">Submit</button>
         <h1 id="user-registration-msg" style="display: none;">User Registration Successfull!</h1>
+        <a href="/login.html">
+            Existing User ?
+        </a>
     </form>
-    <a href="/login.html">
-        Existing User ?
-    </a>
 </body>
-<script src="/script.js"></script>
+<script src="/register.js"></script>
 
 </html>

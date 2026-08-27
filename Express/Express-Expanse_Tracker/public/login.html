@@ -5,66 +5,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <h1>User Login</h1>
     <form onSubmit="handleFormSubmit(event)">
         <label for="email">
-            Email ID ::
+            Email ID
             <input type="email" name="email" id="email">
         </label>
         <br>
         <label for="password">
-            Password ::
-            <input type="password" name="password" id="password">
+            Password
+            <div class="password-container">
+                <input type="password" name="password" id="password">
+                <!-- <button type="button" id="toggle-password"> 👁 </button> -->
+                <button type="button" id="toggle-password">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                </button>
+            </div>
         </label>
         <br>
         <button type="submit">Login</button>
         <h1 id="user-registration-msg" style="display: none;">User Login Successfull!</h1>
-
+        <a href="/register.html">New User ?</a>
     </form>
-    <a href="/register.html">
-        New User ?
-    </a>
-    <script>
-        let userRegistrationMsg = document.getElementById("user-registration-msg");
-        function handleFormSubmit(event) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-
-            const data = {
-                email: formData.get("email"),
-                password: formData.get("password")
-            }
-            console.log(data);
-
-            fetch("/user/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            }).then(async (response) => {
-                const message = await response.text();
-
-                if (response.ok) {
-                    userRegistrationMsg.style.display = "block";
-                    userRegistrationMsg.innerText = message;
-
-                    setTimeout(() => {
-                        window.location.href = "/";
-                    }, 2000);
-                } else {
-                    userRegistrationMsg.style.display = "block";
-                    userRegistrationMsg.innerText = message;
-                }
-            }).catch((error) => {
-                console.error("Registration failed :".error);
-            });
-        }
-    </script>
+    <script src="./login.js"></script>
 </body>
 
 </html>
