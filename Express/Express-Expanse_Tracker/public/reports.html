@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reports - Expanse Tracker</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="dash-header">
+            <h1>Reports</h1>
+            <div class="header-actions">
+                <span id="premiumBadge" class="premium-badge" style="display: none;">&#9733; Premium Member</span>
+                <a href="/dashboard.html" class="btn-leaderboard" id="backBtn">&larr; Back to dashboard</a>
+            </div>
+        </div>
+
+        <!-- Shown to non-premium users instead of the report -->
+        <div id="lockedCard" class="card report-locked" style="display: none;">
+            <h2>Reports is a Premium feature</h2>
+            <p class="muted">Upgrade to Premium to view your daily, weekly and monthly income &amp; expense reports, and
+                to download them as a file.</p>
+            <a href="/dashboard.html" class="btn-primary report-locked-btn">Go Premium from Dashboard</a>
+        </div>
+
+        <!-- Full report, shown to premium users -->
+        <div id="reportContent" style="display: none;">
+
+            <div class="report-summary-row">
+                <div class="summary-card report-summary-card">
+                    <div class="summary-label">Total Income</div>
+                    <div class="summary-amount" id="totalIncome">&#8377;0.00</div>
+                </div>
+                <div class="summary-card report-summary-card report-summary-card--expense">
+                    <div class="summary-label">Total Expense</div>
+                    <div class="summary-amount" id="totalExpense">&#8377;0.00</div>
+                </div>
+                <div class="summary-card report-summary-card report-summary-card--savings">
+                    <div class="summary-label">Savings</div>
+                    <div class="summary-amount" id="totalSavings">&#8377;0.00</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="report-toolbar">
+                    <div class="tabs" id="viewTabs">
+                        <button class="tab-btn active" data-view="daily">Daily</button>
+                        <button class="tab-btn" data-view="weekly">Weekly</button>
+                        <button class="tab-btn" data-view="monthly">Monthly</button>
+                    </div>
+                    <button id="downloadBtn" class="btn-primary report-download-btn" title="Download report">&#8681;
+                        Download</button>
+                </div>
+                <div class="empty-state" id="reportEmpty" style="display: none;">No expenses recorded yet.</div>
+                <div id="reportTables"></div>
+            </div>
+
+        </div>
+    </div>
+    <script src="/js/reports.js"></script>
+</body>
+
+</html>
