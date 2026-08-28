@@ -2,42 +2,34 @@
 const resetForm = document.getElementById("resetForm");
 const errorMsg = document.getElementById("errorMsg");
 const output = document.getElementById("output");
-
 // The link in the email looks like:
-//   /reset-password.html?token=<rawToken>&email=<email>
-const params = new URLSearchParams(window.location.search);
-const token = params.get("token");
-const email = params.get("email");
-
-if (!token || !email) {
-  errorMsg.textContent = "This reset link is missing information. Please request a new one.";
-  resetForm.querySelector("button[type=submit]").disabled = true;
-}
-
+//   /password/resetpassword/<uuid>
+// and the backend only serves this page when that uuid is a valid,
+// still-active request - so we just read the uuid back out of the URL.
+const pathParts = window.location.pathname.split("/").filter(Boolean);
+const requestId = pathParts[pathParts.length - 1];
 resetForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  errorMsg.textContent = "";
-  output.textContent = "";
-
-  const password = document.getElementById("password").value;
-  const confirmPassword = document.getElementById("confirmPassword").value;
-
-  try {
-    const res = await fetch("/password/resetpassword", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, token, password, confirmPassword }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      errorMsg.textContent = data.error || "Could not reset password.";
-      return;
-    }
-    output.textContent = data.message + " Redirecting to log in...";
-    setTimeout(() => {
-      window.location.href = "/login.html";
-    }, 1500);
-  } catch (err) {
-    errorMsg.textContent = "Something went wrong. Please try again.";
-  }
+e.preventDefault();
+errorMsg.textContent = "";
+output.textContent = "";
+const password = document.getElementById("password").value;
+const confirmPassword = document.getElementById("confirmPassword").value;
+try {
+const res = await fetch(`/password/resetpassword/${requestId}`, {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ password, confirmPassword }),
+});
+const data = await res.json();
+if (!res.ok) {
+errorMsg.textContent = data.error || "Could not reset password.";
+return;
+}
+output.textContent = data.message + " Redirecting to log in...";
+setTimeout(() => {
+window.location.href = "/login.html";
+}, 1500);
+} catch (err) {
+errorMsg.textContent = "Something went wrong. Please try again.";
+}
 });

@@ -1,4 +1,3 @@
-// config/cashfree.js
 import { Cashfree, CFEnvironment } from "cashfree-pg";
 // Never hardcode real App ID / Secret Key in source. Put them in a .env
 // file (see .env.example) and load it with a package like dotenv, e.g.

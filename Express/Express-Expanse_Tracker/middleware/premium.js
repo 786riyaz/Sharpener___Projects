@@ -1,4 +1,3 @@
-// middleware/premium.js
 import User from "../models/User.js";
 // Gates a route to premium users only. Reads isPremium fresh from the DB
 // (not from the JWT) so an upgrade takes effect immediately, without the

@@ -1,4 +1,3 @@
-// index.js
 import "dotenv/config"; // loads CASHFREE_APP_ID / CASHFREE_SECRET_KEY etc. from .env
 import express from "express";
 import path from "node:path";
@@ -42,8 +41,8 @@ async function startServer() {
     // exist (e.g. adding userId to an "expanses" table created before this
     // column existed). Fine for development; for production, use proper
     // migrations instead of alter/sync.
-    await sequelize.sync();
-    // await sequelize.sync({ alter: true });
+    // await sequelize.sync();
+    await sequelize.sync({ alter: true });
     // await sequelize.sync({ force: true });
     console.log("Tables synchronized successfully.");
     app.listen(3001, () => {

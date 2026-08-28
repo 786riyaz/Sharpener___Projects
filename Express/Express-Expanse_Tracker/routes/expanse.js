@@ -1,4 +1,3 @@
-// routes/expanse.js
 import express from "express";
 import expanseController from "../controllers/expanse.js";
 import isAuthenticated from "../middleware/auth.js";

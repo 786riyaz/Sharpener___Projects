@@ -1,4 +1,3 @@
-// routes/payment.js
 import express from "express";
 import paymentController from "../controllers/payment.js";
 import isAuthenticated from "../middleware/auth.js";

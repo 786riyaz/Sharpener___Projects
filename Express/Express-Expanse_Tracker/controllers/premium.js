@@ -1,4 +1,3 @@
-// controllers/premium.js
 import { User } from "../models/index.js";
 const premiumController = {
 // GET /premium/leaderboard

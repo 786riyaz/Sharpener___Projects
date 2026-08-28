@@ -1,4 +1,3 @@
-// controllers/expanse.js
 import sequelize from "../config/db.js";
 import Expanse from "../models/Expanse.js";
 import User from "../models/User.js";

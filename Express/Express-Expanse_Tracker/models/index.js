@@ -1,8 +1,8 @@
-// models/index.js
 import sequelize from "../config/db.js";
 import User from "./User.js";
 import Expanse from "./Expanse.js";
 import Order from "./Order.js";
+import ForgotPasswordRequest from "./ForgotPasswordRequest.js";
 // One user can have many expenses
 User.hasMany(Expanse, {
 foreignKey: "userId",
@@ -21,5 +21,14 @@ Order.belongsTo(User, {
 foreignKey: "userId",
 as: "user",
 });
-export { User, Expanse, Order };
+// One user can have many forgot-password requests
+User.hasMany(ForgotPasswordRequest, {
+foreignKey: "userId",
+as: "forgotPasswordRequests",
+});
+ForgotPasswordRequest.belongsTo(User, {
+foreignKey: "userId",
+as: "user",
+});
+export { User, Expanse, Order, ForgotPasswordRequest };
 export default sequelize;

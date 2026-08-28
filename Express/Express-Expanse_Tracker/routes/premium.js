@@ -1,4 +1,3 @@
-// routes/premium.js
 import express from "express";
 import premiumController from "../controllers/premium.js";
 import isAuthenticated from "../middleware/auth.js";

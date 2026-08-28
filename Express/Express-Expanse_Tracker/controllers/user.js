@@ -1,4 +1,3 @@
-// controllers/user.js
 import path from "node:path";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";

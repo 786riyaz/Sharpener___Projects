@@ -1,4 +1,3 @@
-// middleware/auth.js
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/jwt.js";
 // Blocks access to a route unless the request carries a valid JWT

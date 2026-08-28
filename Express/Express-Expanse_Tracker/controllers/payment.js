@@ -1,4 +1,3 @@
-// controllers/payment.js
 import cashfree from "../config/cashfree.js";
 import { Order, User } from "../models/index.js";
 // Server decides the price - never trust an amount sent from the client.

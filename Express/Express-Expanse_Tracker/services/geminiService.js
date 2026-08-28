@@ -1,4 +1,3 @@
-// services/geminiService.js
 //
 // Central place for all Google Gemini calls used by the Expense Tracker.
 // Replaces the old scratch file "Gemini Integration.js" (that file was
@@ -15,7 +14,6 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 // const MODEL = "gemini-2.5-flash";
 // const MODEL = "gemini-3.7-flash";
 const MODEL = "gemini-3-flash-preview";
-
 // Keeping this to a fixed, closed list (instead of letting the model
 // invent categories) means the UI/filtering code never has to deal with
 // unpredictable category strings.
