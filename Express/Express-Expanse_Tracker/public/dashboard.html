@@ -56,6 +56,10 @@
                         <option value="Other">Other</option>
                     </select>
                 </div>
+                <div class="full">
+                    <label for="note">Note (optional)</label>
+                    <input type="text" id="note" name="note" placeholder="e.g. Paid via UPI" maxlength="255" />
+                </div>
                 <button type="submit" class="btn-primary">Add expense</button>
             </form>
             <div class="error-msg" id="errorMsg"></div>
@@ -67,6 +71,7 @@
                     <tr>
                         <th>Category</th>
                         <th>Description</th>
+                        <th>Note</th>
                         <th>Amount</th>
                         <th>Date</th>
                         <th></th>

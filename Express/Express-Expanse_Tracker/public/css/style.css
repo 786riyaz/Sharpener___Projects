@@ -243,6 +243,10 @@ td {
   background: #e7f0e9;
   color: var(--accent-dark);
 }
+.note-cell {
+  color: var(--muted);
+  font-size: 13.5px;
+}
 .deleteBtn {
   background: transparent;
   color: var(--danger);

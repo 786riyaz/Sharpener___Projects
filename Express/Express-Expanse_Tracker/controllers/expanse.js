@@ -7,7 +7,7 @@ const expanseController = {
   addExpanse: async (req, res) => {
     const t = await sequelize.transaction();
     try {
-      let { category, description, amount } = req.body;
+      let { category, description, amount, note } = req.body;
       if (!description || amount === undefined || amount === "") {
         await t.rollback();
         return res.status(400).json({ error: "Description and amount are required." });
@@ -29,6 +29,9 @@ const expanseController = {
           category,
           description,
           amount: numericAmount,
+          // Optional - trim it down to null so blank input doesn't get stored
+          // as an empty string.
+          note: note && note.trim() ? note.trim() : null,
           userId: req.userId,
         },
         { transaction: t },
@@ -95,7 +98,7 @@ const expanseController = {
       if (!isPaginated) {
         const expanses = await Expanse.findAll({
           where: { userId: req.userId },
-          attributes: ["id", "category", "description", "amount", "createdAt"],
+          attributes: ["id", "category", "description", "amount", "note", "createdAt"],
           order: [["createdAt", "DESC"]],
         });
         return res.status(200).json(expanses);
@@ -104,7 +107,7 @@ const expanseController = {
       const pageSize = Math.min(100, Math.max(1, parseInt(limit, 10) || 10));
       const { count, rows } = await Expanse.findAndCountAll({
         where: { userId: req.userId },
-        attributes: ["id", "category", "description", "amount", "createdAt"],
+        attributes: ["id", "category", "description", "amount", "note", "createdAt"],
         order: [["createdAt", "DESC"]],
         limit: pageSize,
         offset: (pageNum - 1) * pageSize,

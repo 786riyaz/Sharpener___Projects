@@ -117,6 +117,7 @@ function renderExpenses(expenses) {
     row.innerHTML = `
 <td><span class="category-pill">${escapeHtml(exp.category)}</span></td>
 <td>${escapeHtml(exp.description)}</td>
+<td class="note-cell">${exp.note ? escapeHtml(exp.note) : "&mdash;"}</td>
 <td class="amount-cell">₹${Number(exp.amount).toFixed(2)}</td>
 <td>${dateStr}</td>
 <td><button class="deleteBtn" data-id="${exp.id}">Delete</button></td>
@@ -154,6 +155,7 @@ expenseForm.addEventListener("submit", async (e) => {
   const amount = document.getElementById("amount").value;
   const description = document.getElementById("description").value.trim();
   const category = document.getElementById("category").value;
+  const note = document.getElementById("note").value.trim();
   if (!amount || !description || !category) {
     errorMsg.textContent = "Please fill in all fields.";
     return;
@@ -162,7 +164,7 @@ expenseForm.addEventListener("submit", async (e) => {
     const res = await fetch("/expanse", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount, description, category }),
+      body: JSON.stringify({ amount, description, category, note }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Failed to add expense.");
