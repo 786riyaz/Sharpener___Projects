@@ -1,19 +1,18 @@
-// routes.user.js
+// routes/user.js
 import express from "express";
-
 import userController from "../controllers/user.js";
+
 const router = express.Router();
 
-// router.get("/register", userController.getRegisterForm);
-// router.post("/register", userController.addUserData);
 router.route("/register")
-.get(userController.getRegisterForm)
-.post(userController.addUserData);
+  .get(userController.getRegisterForm)
+  .post(userController.addUserData);
 
-// router.get("/login", userController.getLoginForm);
-// router.post("/login", userController.userLogin);
 router.route("/login")
-.get(userController.getLoginForm)
-.post(userController.userLogin);
+  .get(userController.getLoginForm)
+  .post(userController.userLogin);
+
+router.post("/logout", userController.logout);
+router.get("/session", userController.checkSession);
 
 export default router;

@@ -1,41 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log In - Expanse Tracker</title>
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
-
 <body>
-    <h1>User Login</h1>
-    <form onSubmit="handleFormSubmit(event)">
-        <label for="email">
-            Email ID
-            <input type="email" name="email" id="email">
-        </label>
-        <br>
-        <label for="password">
-            Password
-            <div class="password-container">
-                <input type="password" name="password" id="password">
-                <!-- <button type="button" id="toggle-password"> 👁 </button> -->
-                <button type="button" id="toggle-password">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
-                        <circle cx="12" cy="12" r="3" />
-                    </svg>
-                </button>
-            </div>
-        </label>
-        <br>
-        <button type="submit">Login</button>
-        <h1 id="user-registration-msg" style="display: none;">User Login Successfull!</h1>
-        <a href="/register.html">New User ?</a>
-    </form>
-    <script src="./login.js"></script>
-</body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="brand">Expanse Tracker</div>
+      <h1>Log in</h1>
+      <form id="loginForm" novalidate>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required />
 
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required />
+
+        <button type="submit" class="btn-primary">Log in</button>
+        <div class="error-msg" id="errorMsg"></div>
+      </form>
+      <div class="switch-link">
+        Don't have an account? <a href="/register.html">Register</a>
+      </div>
+    </div>
+  </div>
+  <script src="/js/login.js"></script>
+</body>
 </html>

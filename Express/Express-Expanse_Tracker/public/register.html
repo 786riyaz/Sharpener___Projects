@@ -1,44 +1,37 @@
-<!-- public/register.html -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - Expanse Tracker</title>
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
-
 <body>
-    <h1>User Registration</h1>
-    <form onSubmit="handleFormSubmit(event)">
-        <label for="name">
-            Name
-            <input type="text" name="name" id="name">
-        </label>
-        <br>
-        <label for="email">
-            Email ID
-            <input type="email" name="email" id="email">
-        </label>
-        <br>
-        <label for="password">
-            Password
-            <input type="text" name="password" id="password">
-        </label>
-        <br>
-        <label for="confirm-password">
-            Confirm Password
-            <input type="password" name="confirm-password" id="confirm-password">
-        </label>
-        <br>
-        <button type="submit">Submit</button>
-        <h1 id="user-registration-msg" style="display: none;">User Registration Successfull!</h1>
-        <a href="/login.html">
-            Existing User ?
-        </a>
-    </form>
-</body>
-<script src="/register.js"></script>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="brand">Expanse Tracker</div>
+      <h1>Create an account</h1>
+      <form id="registerForm" novalidate>
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required />
 
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required />
+
+        <label for="confirmPassword">Confirm password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required />
+
+        <button type="submit" class="btn-primary">Register</button>
+        <div class="error-msg" id="errorMsg"></div>
+      </form>
+      <div class="switch-link">
+        Already have an account? <a href="/login.html">Log in</a>
+      </div>
+    </div>
+  </div>
+  <script src="/js/register.js"></script>
+</body>
 </html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Expanse Tracker</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="dashboard">
+    <div class="dash-header">
+      <h1 id="welcomeMsg">Welcome</h1>
+      <button id="logoutBtn">Log out</button>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-label">Total spent</div>
+      <div class="summary-amount">₹<span id="totalAmount">0.00</span></div>
+    </div>
+
+    <div class="card">
+      <h2>Add an expense</h2>
+      <form id="expenseForm" class="expense-form" novalidate>
+        <div class="full">
+          <label for="amount">Amount spent (₹)</label>
+          <input type="number" id="amount" name="amount" min="0.01" step="0.01" required />
+        </div>
+
+        <div class="full">
+          <label for="description">Description</label>
+          <input type="text" id="description" name="description" placeholder="e.g. Lunch with team" required />
+        </div>
+
+        <div class="full">
+          <label for="category">Category</label>
+          <select id="category" name="category" required>
+            <option value="" disabled selected>Select a category</option>
+            <option value="Food">Food</option>
+            <option value="Petrol">Petrol</option>
+            <option value="Salary">Salary</option>
+            <option value="Rent">Rent</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Bills">Bills</option>
+            <option value="Health">Health</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-primary">Add expense</button>
+      </form>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>Your expenses</h2>
+      <table id="expenseTable">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display: none;">No expenses yet. Add your first one above.</div>
+    </div>
+  </div>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
