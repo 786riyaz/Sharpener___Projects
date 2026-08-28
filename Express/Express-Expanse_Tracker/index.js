@@ -7,6 +7,7 @@ import sequelize from "./models/index.js"; // also registers the User <-> Expans
 import userRouter from "./routes/user.js";
 import expanseRouter from "./routes/expanse.js";
 import paymentRouter from "./routes/payment.js";
+import premiumRouter from "./routes/premium.js";
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use(
 app.use("/user", userRouter);
 app.use("/expanse", expanseRouter);
 app.use("/payment", paymentRouter);
+app.use("/premium", premiumRouter);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(import.meta.dirname, "public", "login.html"));

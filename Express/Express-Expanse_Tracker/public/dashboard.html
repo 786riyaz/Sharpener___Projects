@@ -8,12 +8,17 @@
 </head>
 <body>
   <div class="dashboard">
+    <div id="premiumHeadline" class="premium-headline" style="display: none;">
+      &#127881; You are a premium user now
+    </div>
+
     <div id="paymentBanner" class="payment-banner" style="display: none;"></div>
 
     <div class="dash-header">
       <h1 id="welcomeMsg">Welcome</h1>
       <div class="header-actions">
         <span id="premiumBadge" class="premium-badge" style="display: none;">&#9733; Premium Member</span>
+        <button id="leaderboardBtn" class="btn-leaderboard" style="display: none;">Leader Board</button>
         <button id="buyPremiumBtn" class="btn-premium" style="display: none;">Buy Premium Membership</button>
         <button id="logoutBtn">Log out</button>
       </div>
@@ -75,6 +80,18 @@
       <div class="empty-state" id="emptyState" style="display: none;">No expenses yet. Add your first one above.</div>
     </div>
   </div>
+
+  <div id="leaderboardModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Leader Board</h2>
+        <button id="closeLeaderboardBtn" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+      <ol id="leaderboardList" class="leaderboard-list"></ol>
+      <div class="empty-state" id="leaderboardEmpty" style="display: none;">No expenses recorded yet.</div>
+    </div>
+  </div>
+
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <script src="/js/dashboard.js"></script>
 </body>

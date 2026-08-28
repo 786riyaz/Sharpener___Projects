@@ -2,6 +2,12 @@ const welcomeMsg = document.getElementById("welcomeMsg");
 const logoutBtn = document.getElementById("logoutBtn");
 const buyPremiumBtn = document.getElementById("buyPremiumBtn");
 const premiumBadge = document.getElementById("premiumBadge");
+const premiumHeadline = document.getElementById("premiumHeadline");
+const leaderboardBtn = document.getElementById("leaderboardBtn");
+const leaderboardModal = document.getElementById("leaderboardModal");
+const closeLeaderboardBtn = document.getElementById("closeLeaderboardBtn");
+const leaderboardList = document.getElementById("leaderboardList");
+const leaderboardEmpty = document.getElementById("leaderboardEmpty");
 const paymentBanner = document.getElementById("paymentBanner");
 const expenseForm = document.getElementById("expenseForm");
 const expenseTableBody = document.querySelector("#expenseTable tbody");
@@ -32,9 +38,13 @@ function updatePremiumUI(isPremium) {
   if (isPremium) {
     premiumBadge.style.display = "inline-block";
     buyPremiumBtn.style.display = "none";
+    premiumHeadline.style.display = "block";
+    leaderboardBtn.style.display = "inline-block";
   } else {
     premiumBadge.style.display = "none";
     buyPremiumBtn.style.display = "inline-block";
+    premiumHeadline.style.display = "none";
+    leaderboardBtn.style.display = "none";
   }
 }
 
@@ -198,6 +208,70 @@ function showBanner(type, message) {
   paymentBanner.textContent = message;
   paymentBanner.className = `payment-banner ${type}`;
   paymentBanner.style.display = "block";
+}
+
+// --- Premium feature: user leaderboard ---
+
+leaderboardBtn.addEventListener("click", async () => {
+  await loadLeaderboard();
+  openLeaderboardModal();
+});
+
+closeLeaderboardBtn.addEventListener("click", closeLeaderboardModal);
+
+// Close when clicking the dark overlay outside the card.
+leaderboardModal.addEventListener("click", (e) => {
+  if (e.target === leaderboardModal) closeLeaderboardModal();
+});
+
+// Close on Escape.
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && leaderboardModal.style.display !== "none") {
+    closeLeaderboardModal();
+  }
+});
+
+function openLeaderboardModal() {
+  leaderboardModal.style.display = "flex";
+}
+
+function closeLeaderboardModal() {
+  leaderboardModal.style.display = "none";
+}
+
+async function loadLeaderboard() {
+  leaderboardList.innerHTML = "";
+  leaderboardEmpty.style.display = "none";
+  try {
+    const res = await fetch("/premium/leaderboard");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to load leaderboard.");
+    renderLeaderboard(data);
+  } catch (err) {
+    leaderboardEmpty.textContent = err.message;
+    leaderboardEmpty.style.display = "block";
+  }
+}
+
+function renderLeaderboard(entries) {
+  leaderboardList.innerHTML = "";
+
+  if (entries.length === 0) {
+    leaderboardEmpty.textContent = "No expenses recorded yet.";
+    leaderboardEmpty.style.display = "block";
+    return;
+  }
+  leaderboardEmpty.style.display = "none";
+
+  entries.forEach((entry, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <span class="lb-rank">#${index + 1}</span>
+      <span class="lb-name">${escapeHtml(entry.name)}</span>
+      <span class="lb-amount">₹${Number(entry.totalExpense).toFixed(2)}</span>
+    `;
+    leaderboardList.appendChild(li);
+  });
 }
 
 checkAuth();
