@@ -8,15 +8,12 @@ import userRouter from "./routes/user.js";
 import expanseRouter from "./routes/expanse.js";
 import paymentRouter from "./routes/payment.js";
 import premiumRouter from "./routes/premium.js";
-
+import passwordRouter from "./routes/password.js";
 const app = express();
-
 app.use(express.json());
-
 // Lets Express read the httpOnly "token" cookie (containing the JWT) off
 // incoming requests, via req.cookies.token.
 app.use(cookieParser());
-
 app.use(
   express.static(path.join(import.meta.dirname, "public"), {
     setHeaders: (res, filePath) => {
@@ -29,16 +26,14 @@ app.use(
     },
   }),
 );
-
 app.use("/user", userRouter);
 app.use("/expanse", expanseRouter);
 app.use("/payment", paymentRouter);
 app.use("/premium", premiumRouter);
-
+app.use("/password", passwordRouter);
 app.get("/", (req, res) => {
   res.sendFile(path.join(import.meta.dirname, "public", "login.html"));
 });
-
 async function startServer() {
   try {
     await sequelize.authenticate();
@@ -47,7 +42,9 @@ async function startServer() {
     // exist (e.g. adding userId to an "expanses" table created before this
     // column existed). Fine for development; for production, use proper
     // migrations instead of alter/sync.
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
+    // await sequelize.sync({ alter: true });
+    // await sequelize.sync({ force: true });
     console.log("Tables synchronized successfully.");
     app.listen(3001, () => {
       console.log("Server is running on port 3001");
@@ -56,5 +53,4 @@ async function startServer() {
     console.error("Unable to start server:", error);
   }
 }
-
 startServer();
