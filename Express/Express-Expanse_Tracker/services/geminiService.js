@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 //
 // Central place for all Google Gemini calls used by the Expense Tracker.
 // Replaces the old scratch file "Gemini Integration.js" (that file was
@@ -44,7 +45,7 @@ const raw = (response.text ?? "").trim();
 const match = CATEGORIES.find((c) => raw.toLowerCase() === c.toLowerCase()) ?? CATEGORIES.find((c) => raw.toLowerCase().includes(c.toLowerCase()));
 return match ?? "Other";
 } catch (error) {
-console.error("Gemini suggestCategory error:", error);
+logger.error("Gemini suggestCategory error:", { error: error?.message || error, stack: error?.stack });
 return "Other";
 }
 }
@@ -57,7 +58,7 @@ if (!expenses || expenses.length === 0) {
 return "Add a few expenses and I'll start spotting patterns in your spending.";
 }
 try {
-console.log("Expanses :: ", expenses);
+logger.info("Expanses :: ", expenses);
 const summary = expenses
 .slice(0, 30)
 .map((e) => `- ${e.category}: ${e.amount} (${e.description})`)
@@ -77,7 +78,7 @@ contents: prompt,
 });
 return (response.text ?? "").trim() || "Keep tracking - patterns will emerge as you add more expenses.";
 } catch (error) {
-console.error("Gemini getSpendingInsight error:", error);
+logger.error("Gemini getSpendingInsight error:", { error: error?.message || error, stack: error?.stack });
 return "Insights are temporarily unavailable - please try again shortly.";
 }
 }

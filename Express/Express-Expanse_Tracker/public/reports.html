@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reports - Expanse Tracker</title>
     <link rel="stylesheet" href="/css/style.css" />
 </head>
-
 <body>
     <div class="dashboard">
         <div class="dash-header">
@@ -17,7 +15,6 @@
                 <a href="/dashboard.html" class="btn-leaderboard" id="backBtn">&larr; Back to dashboard</a>
             </div>
         </div>
-
         <!-- Shown to non-premium users instead of the report -->
         <div id="lockedCard" class="card report-locked" style="display: none;">
             <h2>Reports is a Premium feature</h2>
@@ -25,10 +22,8 @@
                 to download them as a file.</p>
             <a href="/dashboard.html" class="btn-primary report-locked-btn">Go Premium from Dashboard</a>
         </div>
-
         <!-- Full report, shown to premium users -->
         <div id="reportContent" style="display: none;">
-
             <div class="report-summary-row">
                 <div class="summary-card report-summary-card">
                     <div class="summary-label">Total Income</div>
@@ -43,7 +38,6 @@
                     <div class="summary-amount" id="totalSavings">&#8377;0.00</div>
                 </div>
             </div>
-
             <div class="card">
                 <div class="report-toolbar">
                     <div class="tabs" id="viewTabs">
@@ -66,10 +60,8 @@
                         per page</label>
                 </div>
             </div>
-
         </div>
     </div>
     <script src="/js/reports.js"></script>
 </body>
-
 </html>

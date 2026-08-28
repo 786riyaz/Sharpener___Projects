@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import sequelize from "../config/db.js";
 import Expanse from "../models/Expanse.js";
 import User from "../models/User.js";
@@ -46,7 +47,7 @@ const expanseController = {
       res.status(201).json(expanse);
     } catch (error) {
       await t.rollback();
-      console.error("Add expanse error:", error);
+      logger.error("Add expanse error:", { error: error?.message || error, stack: error?.stack });
       res.status(500).json({ error: "Failed to add expense." });
     }
   },
@@ -62,7 +63,7 @@ const expanseController = {
       const category = await suggestCategory(description);
       res.status(200).json({ category });
     } catch (error) {
-      console.error("Suggest category error:", error);
+      logger.error("Suggest category error:", { error: error?.message || error, stack: error?.stack });
       res.status(500).json({ error: "Failed to suggest a category." });
     }
   },
@@ -80,7 +81,7 @@ const expanseController = {
       const insight = await getSpendingInsight(expanses);
       res.status(200).json({ insight });
     } catch (error) {
-      console.error("Get insights error:", error);
+      logger.error("Get insights error:", { error: error?.message || error, stack: error?.stack });
       res.status(500).json({ error: "Failed to generate insight." });
     }
   },
@@ -126,7 +127,7 @@ const expanseController = {
         totalAmount: user?.totalExpense || 0,
       });
     } catch (error) {
-      console.error("Get expanse error:", error);
+      logger.error("Get expanse error:", { error: error?.message || error, stack: error?.stack });
       res.status(500).json({ error: "Failed to fetch expenses." });
     }
   },
@@ -154,7 +155,7 @@ const expanseController = {
       res.status(200).json({ message: "Expense deleted successfully." });
     } catch (error) {
       await t.rollback();
-      console.error("Delete expanse error:", error);
+      logger.error("Delete expanse error:", { error: error?.message || error, stack: error?.stack });
       res.status(500).json({ error: "Failed to delete expense." });
     }
   },

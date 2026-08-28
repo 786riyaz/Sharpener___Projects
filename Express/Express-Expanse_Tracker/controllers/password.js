@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 // controllers/password.js
 import path from "node:path";
 import bcrypt from "bcrypt";
@@ -5,11 +6,9 @@ import { v4 as uuidv4 } from "uuid";
 import User from "../models/User.js";
 import ForgotPasswordRequest from "../models/ForgotPasswordRequest.js";
 import transporter from "../config/mailer.js";
-
 // Where the frontend reset-password page lives. Override in .env for
 // production (e.g. https://your-domain.com).
 const APP_BASE_URL = process.env.APP_BASE_URL || "http://localhost:3001";
-
 const passwordController = {
 // POST /password/forgotpassword  { email }
 // Always responds with the same generic message whether or not the
@@ -54,16 +53,16 @@ html: `
 `,
 });
 } catch (mailError) {
-console.error("Failed to send reset email:", mailError);
+logger.error("Failed to send reset email:", { error: mailError?.message || mailError, stack: mailError?.stack });
 // Don't reveal mail-sending failures to the client either -
 // still return the generic response.
 }
 // Handy in dev / if SMTP isn't configured yet: the link still works,
 // you just have to grab it from the server log instead of an inbox.
-console.log("Password reset link:", resetLink);
+logger.info("Password reset link:", resetLink);
 return res.status(200).json(genericResponse);
 } catch (error) {
-console.error("Forgot password error:", error);
+logger.error("Forgot password error:", { error: error?.message || error, stack: error?.stack });
 res.status(500).json({ error: "Something went wrong. Please try again." });
 }
 },
@@ -80,7 +79,7 @@ return res.redirect("/login.html?resetError=invalid");
 }
 return res.sendFile(path.join(import.meta.dirname, "..", "public", "reset-password.html"));
 } catch (error) {
-console.error("Get reset form error:", error);
+logger.error("Get reset form error:", { error: error?.message || error, stack: error?.stack });
 res.redirect("/login.html?resetError=invalid");
 }
 },
@@ -114,7 +113,7 @@ request.isActive = false;
 await request.save();
 return res.status(200).json({ message: "Password has been reset. You can now log in." });
 } catch (error) {
-console.error("Reset password error:", error);
+logger.error("Reset password error:", { error: error?.message || error, stack: error?.stack });
 res.status(500).json({ error: "Something went wrong. Please try again." });
 }
 },

@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { User } from "../models/index.js";
 const premiumController = {
 // GET /premium/leaderboard
@@ -23,7 +24,7 @@ totalExpense: Number(row.totalExpense),
 }));
 res.status(200).json(leaderboard);
 } catch (error) {
-console.error("Leaderboard error:", error);
+logger.error("Leaderboard error:", { error: error?.message || error, stack: error?.stack });
 res.status(500).json({ error: "Failed to load leaderboard." });
 }
 },

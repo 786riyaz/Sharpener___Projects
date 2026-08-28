@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import cashfree from "../config/cashfree.js";
 import { Order, User } from "../models/index.js";
 // Server decides the price - never trust an amount sent from the client.
@@ -19,7 +20,7 @@ const paymentController = {
       const user = await User.findByPk(req.userId, {
         attributes: ["id", "name", "email"],
       });
-      // console.log("User ::", user);
+      // logger.info("User ::", user);
       if (!user) {
         return res.status(404).json({ error: "User not found." });
       }
@@ -67,7 +68,7 @@ const paymentController = {
         paymentSessionId: cfResponse.data.payment_session_id,
       });
     } catch (error) {
-      console.error("Create order error:", error.response?.data || error);
+      logger.error("Create order error:", { error: error.response?.data || error?.message || error, stack: error?.stack });
       res.status(500).json({ error: "Failed to create order." });
     }
   },
@@ -83,7 +84,7 @@ const paymentController = {
         where: { orderId },
         attributes: ["id", "orderId", "userId", "status", "expiresAt"],
       });
-      // console.log("Order ::", order);
+      // logger.info("Order ::", order);
       if (!order) {
         return res.status(404).json({ error: "Order not found." });
       }
@@ -123,7 +124,7 @@ const paymentController = {
       // and let the frontend try verifying again later.
       res.status(200).json({ status: order.status });
     } catch (error) {
-      console.error("Verify payment error:", error.response?.data || error);
+      logger.error("Verify payment error:", { error: error.response?.data || error?.message || error, stack: error?.stack });
       res.status(500).json({ error: "Failed to verify payment." });
     }
   },

@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import path from "node:path";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -25,7 +26,7 @@ const hashPassword = await bcrypt.hash(password, 10);
 await User.create({ name, email, password: hashPassword });
 res.status(201).send("User Registration Completed.");
 } catch (error) {
-console.error(error);
+logger.error("Register error:", { error: error?.message || error, stack: error?.stack });
 if (error.name === "SequelizeUniqueConstraintError") {
 return res.status(409).send("Email already registered.");
 }
@@ -68,7 +69,7 @@ message: "Login successful",
 user: { id: user.id, name: user.name, email: user.email },
 });
 } catch (error) {
-console.error("Login error:", error);
+logger.error("Login error:", { error: error?.message || error, stack: error?.stack });
 res.status(500).json({ error: "An unexpected error occurred." });
 }
 },

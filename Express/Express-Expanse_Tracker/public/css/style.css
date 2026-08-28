@@ -350,7 +350,6 @@ td {
   padding: 24px 0;
   font-size: 14px;
 }
-
 /* ---------- Reports (Premium feature) ---------- */
 .muted {
   color: var(--muted);
@@ -460,7 +459,6 @@ td {
     grid-template-columns: 1fr;
   }
 }
-
 /* ---------- Pagination ---------- */
 .pagination {
   display: flex;

@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import User from "../models/User.js";
 // Gates a route to premium users only. Reads isPremium fresh from the DB
 // (not from the JWT) so an upgrade takes effect immediately, without the
@@ -10,7 +11,7 @@ return res.status(403).json({ error: "This feature is available to Premium membe
 }
 next();
 } catch (error) {
-console.error("Premium check error:", error);
+logger.error("Premium check error:", { error: error?.message || error, stack: error?.stack });
 res.status(500).json({ error: "Could not verify premium status." });
 }
 };

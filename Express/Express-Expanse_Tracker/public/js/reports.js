@@ -5,7 +5,6 @@
 // monthly views. No new backend routes are introduced here - a future
 // task can swap loadExpenses()/buildDownloadFile() to call a dedicated
 // backend report/export endpoint without changing this page's markup.
-
 const premiumBadge = document.getElementById("premiumBadge");
 const lockedCard = document.getElementById("lockedCard");
 const reportContent = document.getElementById("reportContent");
@@ -21,11 +20,9 @@ const allPrevPageBtn = document.getElementById("allPrevPageBtn");
 const allNextPageBtn = document.getElementById("allNextPageBtn");
 const allPageInfo = document.getElementById("allPageInfo");
 const allPageSizeSelect = document.getElementById("allPageSizeSelect");
-
 let allExpenses = [];
 let currentView = "daily";
 let isPremiumUser = false;
-
 // "All Expenses" tab pagination - independent of the Daily/Weekly/Monthly
 // views above, which need the FULL unpaginated `allExpenses` array to
 // compute correct totals/subtotals. Page size is user-configurable and
@@ -36,7 +33,6 @@ const DEFAULT_PAGE_SIZE = 10;
 let allViewPageSize = getStoredPageSize();
 let allViewPage = 1;
 let allViewTotalPages = 1;
-
 function getStoredPageSize() {
   try {
     const stored = parseInt(localStorage.getItem(PAGE_SIZE_STORAGE_KEY), 10);
@@ -61,13 +57,11 @@ allPageSizeSelect.addEventListener("change", () => {
   setStoredPageSize(allViewPageSize);
   loadAllExpensesPage(1);
 });
-
 // Categories that represent money coming in. The Expanse model doesn't
 // have an explicit income/expense flag yet, so - matching how "Salary"
 // is already used as a category in this app - anything filed under
 // Salary is treated as income and everything else as an expense.
 const INCOME_CATEGORIES = new Set(["Salary"]);
-
 async function checkAuthAndLoad() {
   try {
     const res = await fetch("/user/session");
@@ -78,14 +72,12 @@ async function checkAuthAndLoad() {
     }
     isPremiumUser = !!data.user.isPremium;
     premiumBadge.style.display = isPremiumUser ? "inline-block" : "none";
-
     if (!isPremiumUser) {
       lockedCard.style.display = "block";
       reportContent.style.display = "none";
       setDownloadEnabled(false);
       return;
     }
-
     lockedCard.style.display = "none";
     reportContent.style.display = "block";
     setDownloadEnabled(true);
@@ -96,18 +88,15 @@ async function checkAuthAndLoad() {
     window.location.href = "/login.html";
   }
 }
-
 async function loadExpenses() {
   const res = await fetch("/expanse");
   if (!res.ok) throw new Error("Failed to load expenses.");
   allExpenses = await res.json();
 }
-
 function setDownloadEnabled(enabled) {
   downloadBtn.disabled = !enabled;
   downloadBtn.title = enabled ? "Download report" : "Upgrade to Premium to download reports";
 }
-
 // --- Tabs ---
 viewTabs.addEventListener("click", (e) => {
   const btn = e.target.closest(".tab-btn");
@@ -117,29 +106,23 @@ viewTabs.addEventListener("click", (e) => {
   currentView = btn.dataset.view;
   renderCurrentView();
 });
-
 function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str;
   return div.innerHTML;
 }
-
 function money(n) {
   return `₹${Number(n || 0).toFixed(2)}`;
 }
-
 function isIncome(exp) {
   return INCOME_CATEGORIES.has(exp.category);
 }
-
 function dayKey(d) {
   return d.toISOString().slice(0, 10); // YYYY-MM-DD
 }
-
 function monthKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
-
 function monthLabel(key) {
   const [y, m] = key.split("-");
   return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString(undefined, {
@@ -147,7 +130,6 @@ function monthLabel(key) {
     year: "numeric",
   });
 }
-
 // ISO-ish week key: year + week number (Mon-Sun), so "weekly" groups
 // expenses that fall in the same calendar week.
 function weekKey(d) {
@@ -158,7 +140,6 @@ function weekKey(d) {
   const weekNo = Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
   return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2, "0")}`;
 }
-
 function weekRangeLabel(dates) {
   const sorted = [...dates].sort((a, b) => a - b);
   const start = sorted[0];
@@ -166,24 +147,20 @@ function weekRangeLabel(dates) {
   const fmt = (d) => d.toLocaleDateString(undefined, { day: "2-digit", month: "short" });
   return `${fmt(start)} - ${fmt(end)}`;
 }
-
 function renderCurrentView() {
   reportTables.innerHTML = "";
   computeOverallTotals();
   allExpensesPagination.style.display = "none";
-
   if (allExpenses.length === 0) {
     reportEmpty.style.display = "block";
     return;
   }
   reportEmpty.style.display = "none";
-
   if (currentView === "daily") renderDaily();
   else if (currentView === "weekly") renderWeekly();
   else if (currentView === "monthly") renderMonthly();
   else loadAllExpensesPage(1);
 }
-
 // --- "All Expenses" tab: flat, paginated list (10 per page) ---
 async function loadAllExpensesPage(page) {
   try {
@@ -199,7 +176,6 @@ async function loadAllExpensesPage(page) {
     reportEmpty.style.display = "block";
   }
 }
-
 function renderAllExpensesTable(expenses) {
   let rowsHtml = "";
   expenses.forEach((exp) => {
@@ -221,21 +197,18 @@ function renderAllExpensesTable(expenses) {
       <tbody>${rowsHtml}</tbody>
     </table>`;
 }
-
 function renderAllExpensesPagination(totalCount) {
   allExpensesPagination.style.display = "flex";
   allPageInfo.textContent = `Page ${allViewPage} of ${allViewTotalPages} (${totalCount} total)`;
   allPrevPageBtn.disabled = allViewPage <= 1;
   allNextPageBtn.disabled = allViewPage >= allViewTotalPages;
 }
-
 allPrevPageBtn.addEventListener("click", () => {
   if (allViewPage > 1) loadAllExpensesPage(allViewPage - 1);
 });
 allNextPageBtn.addEventListener("click", () => {
   if (allViewPage < allViewTotalPages) loadAllExpensesPage(allViewPage + 1);
 });
-
 function computeOverallTotals() {
   let income = 0;
   let expense = 0;
@@ -247,7 +220,6 @@ function computeOverallTotals() {
   totalExpenseEl.textContent = money(expense);
   totalSavingsEl.textContent = money(income - expense);
 }
-
 // --- Daily view: each day's rows plus a per-day + per-month subtotal ---
 function renderDaily() {
   const byMonth = new Map();
@@ -260,16 +232,13 @@ function renderDaily() {
     if (!byDay.has(dKey)) byDay.set(dKey, []);
     byDay.get(dKey).push(exp);
   });
-
   const monthKeys = [...byMonth.keys()].sort().reverse();
   monthKeys.forEach((mKey) => {
     const byDay = byMonth.get(mKey);
     const dayKeys = [...byDay.keys()].sort().reverse();
-
     let monthIncome = 0;
     let monthExpense = 0;
     let rowsHtml = "";
-
     dayKeys.forEach((dKey) => {
       const rows = byDay.get(dKey);
       let dayIncome = 0;
@@ -296,7 +265,6 @@ function renderDaily() {
       monthIncome += dayIncome;
       monthExpense += dayExpense;
     });
-
     reportTables.insertAdjacentHTML(
       "beforeend",
       `
@@ -322,7 +290,6 @@ function renderDaily() {
     );
   });
 }
-
 // --- Weekly view: one row per week ---
 function renderWeekly() {
   const byWeek = new Map();
@@ -335,7 +302,6 @@ function renderWeekly() {
     else bucket.expense += Number(exp.amount);
     bucket.dates.push(d);
   });
-
   const weekKeys = [...byWeek.keys()].sort().reverse();
   let rowsHtml = "";
   weekKeys.forEach((key) => {
@@ -348,7 +314,6 @@ function renderWeekly() {
         <td class="amount-cell">${money(bucket.income - bucket.expense)}</td>
       </tr>`;
   });
-
   reportTables.insertAdjacentHTML(
     "beforeend",
     `
@@ -360,7 +325,6 @@ function renderWeekly() {
     </table>`,
   );
 }
-
 // --- Monthly view: one row per month (mirrors the "Yearly Report" table) ---
 function renderMonthly() {
   const byMonth = new Map();
@@ -372,7 +336,6 @@ function renderMonthly() {
     if (isIncome(exp)) bucket.income += Number(exp.amount);
     else bucket.expense += Number(exp.amount);
   });
-
   const monthKeys = [...byMonth.keys()].sort().reverse();
   let rowsHtml = "";
   monthKeys.forEach((key) => {
@@ -385,7 +348,6 @@ function renderMonthly() {
         <td class="amount-cell">${money(bucket.income - bucket.expense)}</td>
       </tr>`;
   });
-
   reportTables.insertAdjacentHTML(
     "beforeend",
     `
@@ -398,7 +360,6 @@ function renderMonthly() {
     </table>`,
   );
 }
-
 function formatDate(dKey) {
   const [y, m, d] = dKey.split("-").map(Number);
   return new Date(y, m - 1, d).toLocaleDateString(undefined, {
@@ -407,7 +368,6 @@ function formatDate(dKey) {
     year: "numeric",
   });
 }
-
 // --- Download (client-side CSV for now; can be swapped for a backend
 // generated file - e.g. PDF/XLSX - in a future task without touching
 // the rest of this page) ---
@@ -432,14 +392,11 @@ downloadBtn.addEventListener("click", () => {
   a.remove();
   URL.revokeObjectURL(url);
 });
-
 function csvEscape(value) {
   const str = String(value ?? "");
   return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
 }
-
 checkAuthAndLoad();
-
 // Re-check premium status when the page is restored from bfcache, same
 // pattern used on the dashboard.
 window.addEventListener("pageshow", (event) => {

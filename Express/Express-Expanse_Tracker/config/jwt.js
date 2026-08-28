@@ -1,3 +1,6 @@
-// Move this to an environment variable (process.env.JWT_SECRET) in production.
-export const JWT_SECRET = "expanse-tracker-jwt-secret-key";
-export const JWT_EXPIRES_IN = "1d";
+import "dotenv/config";
+
+// Must be set in .env - the app refuses to start without it (see index.js),
+// since a missing/guessable secret would let anyone forge login tokens.
+export const JWT_SECRET = process.env.JWT_SECRET;
+export const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";

@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
-
 // Stores every "forgot password" request a user generates.
 // - id: a UUID (long, unguessable string) instead of an auto-increment
 //   int, so nobody can enumerate/guess another user's reset link. It is
@@ -33,5 +32,4 @@ const ForgotPasswordRequest = sequelize.define(
     timestamps: true,
   },
 );
-
 export default ForgotPasswordRequest;
