@@ -1,10 +1,12 @@
 // index.js
+import "dotenv/config"; // loads CASHFREE_APP_ID / CASHFREE_SECRET_KEY etc. from .env
 import express from "express";
 import path from "node:path";
 import cookieParser from "cookie-parser";
 import sequelize from "./models/index.js"; // also registers the User <-> Expanse association
 import userRouter from "./routes/user.js";
 import expanseRouter from "./routes/expanse.js";
+import paymentRouter from "./routes/payment.js";
 
 const app = express();
 
@@ -29,6 +31,7 @@ app.use(
 
 app.use("/user", userRouter);
 app.use("/expanse", expanseRouter);
+app.use("/payment", paymentRouter);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(import.meta.dirname, "public", "login.html"));

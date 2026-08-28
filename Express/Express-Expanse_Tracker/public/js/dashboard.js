@@ -1,5 +1,8 @@
 const welcomeMsg = document.getElementById("welcomeMsg");
 const logoutBtn = document.getElementById("logoutBtn");
+const buyPremiumBtn = document.getElementById("buyPremiumBtn");
+const premiumBadge = document.getElementById("premiumBadge");
+const paymentBanner = document.getElementById("paymentBanner");
 const expenseForm = document.getElementById("expenseForm");
 const expenseTableBody = document.querySelector("#expenseTable tbody");
 const emptyState = document.getElementById("emptyState");
@@ -17,9 +20,21 @@ async function checkAuth() {
       return;
     }
     welcomeMsg.textContent = `Welcome, ${data.user.name}`;
+    updatePremiumUI(data.user.isPremium);
     loadExpenses();
+    handlePaymentReturn();
   } catch {
     window.location.href = "/login.html";
+  }
+}
+
+function updatePremiumUI(isPremium) {
+  if (isPremium) {
+    premiumBadge.style.display = "inline-block";
+    buyPremiumBtn.style.display = "none";
+  } else {
+    premiumBadge.style.display = "none";
+    buyPremiumBtn.style.display = "inline-block";
   }
 }
 
@@ -123,6 +138,67 @@ logoutBtn.addEventListener("click", async () => {
   await fetch("/user/logout", { method: "POST" });
   window.location.href = "/login.html";
 });
+
+// --- Premium membership purchase (Cashfree) ---
+
+buyPremiumBtn.addEventListener("click", async () => {
+  buyPremiumBtn.disabled = true;
+  buyPremiumBtn.textContent = "Loading...";
+  try {
+    const res = await fetch("/payment/create-order", { method: "POST" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Could not start payment.");
+
+    // Cashfree's hosted checkout SDK, loaded via <script> in dashboard.html.
+    const cashfree = Cashfree({ mode: "sandbox" });
+    cashfree.checkout({
+      paymentSessionId: data.paymentSessionId,
+      redirectTarget: "_self", // stay in the current tab, then redirect back to us
+    });
+  } catch (err) {
+    showBanner("failure", err.message);
+    buyPremiumBtn.disabled = false;
+    buyPremiumBtn.textContent = "Buy Premium Membership";
+  }
+});
+
+// After Cashfree redirects back here, the URL looks like
+// /dashboard.html?order_id=premium_13_172... - check it and show the result.
+async function handlePaymentReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const orderId = params.get("order_id");
+  if (!orderId) return;
+
+  // Clean the query string out of the address bar right away so a refresh
+  // or the back button doesn't re-trigger verification.
+  window.history.replaceState({}, "", "/dashboard.html");
+
+  try {
+    const res = await fetch(`/payment/verify/${orderId}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Could not verify payment.");
+
+    if (data.status === "SUCCESS") {
+      showBanner("success", "Transaction successful! You're now a Premium Member.");
+      updatePremiumUI(true);
+    } else if (data.status === "FAILED") {
+      showBanner("failure", "TRANSACTION FAILED. Please try again.");
+    } else {
+      showBanner("pending", "Your payment is still pending. We'll update your status shortly.");
+    }
+  } catch (err) {
+    showBanner("failure", err.message);
+  } finally {
+    buyPremiumBtn.disabled = false;
+    buyPremiumBtn.textContent = "Buy Premium Membership";
+  }
+}
+
+function showBanner(type, message) {
+  paymentBanner.textContent = message;
+  paymentBanner.className = `payment-banner ${type}`;
+  paymentBanner.style.display = "block";
+}
 
 checkAuth();
 

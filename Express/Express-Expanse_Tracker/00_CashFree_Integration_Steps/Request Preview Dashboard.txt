@@ -1,0 +1,8 @@
+curl --location 'https://www.cashfree.com/devstudio/preview/pg/webhooks/43200891' --header 'Content-Type: application/json' --data '{
+    "data": {
+        "payment": {
+            "payment_status": "SUCCESS"
+        }
+    },
+    "type": "PAYMENT_SUCCESS_WEBHOOK"
+}'

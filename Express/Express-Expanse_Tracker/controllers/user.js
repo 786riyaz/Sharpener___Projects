@@ -2,7 +2,9 @@
 import path from "node:path";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Op } from "sequelize";
 import User from "../models/User.js";
+import Order from "../models/Order.js";
 import { JWT_SECRET, JWT_EXPIRES_IN } from "../config/jwt.js";
 
 const userController = {
@@ -85,16 +87,40 @@ const userController = {
 
   // The frontend calls this on page load to decide whether to show
   // the expense dashboard or bounce the visitor to the login page.
-  checkSession: function (req, res) {
+  checkSession: async function (req, res) {
     const token = req.cookies.token;
     if (!token) {
       return res.status(200).json({ loggedIn: false });
     }
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
+      // isPremium can change after the token was issued (e.g. a purchase
+      // completes mid-session), so read it fresh from the DB each time
+      // rather than trusting whatever was baked into the JWT at login.
+      const user = await User.findByPk(decoded.userId, {
+        attributes: ["id", "name", "isPremium"],
+      });
+      if (!user) {
+        return res.status(200).json({ loggedIn: false });
+      }
+
+      // A user might close the tab mid-checkout and never get redirected
+      // back to trigger /payment/verify. Catch those here too, so a
+      // 10-minute-old PENDING order doesn't sit there forever.
+      await Order.update(
+        { status: "FAILED" },
+        {
+          where: {
+            userId: user.id,
+            status: "PENDING",
+            expiresAt: { [Op.lt]: new Date() },
+          },
+        },
+      );
+
       return res.status(200).json({
         loggedIn: true,
-        user: { id: decoded.userId, name: decoded.name },
+        user: { id: user.id, name: user.name, isPremium: user.isPremium },
       });
     } catch (error) {
       return res.status(200).json({ loggedIn: false });

@@ -8,9 +8,15 @@
 </head>
 <body>
   <div class="dashboard">
+    <div id="paymentBanner" class="payment-banner" style="display: none;"></div>
+
     <div class="dash-header">
       <h1 id="welcomeMsg">Welcome</h1>
-      <button id="logoutBtn">Log out</button>
+      <div class="header-actions">
+        <span id="premiumBadge" class="premium-badge" style="display: none;">&#9733; Premium Member</span>
+        <button id="buyPremiumBtn" class="btn-premium" style="display: none;">Buy Premium Membership</button>
+        <button id="logoutBtn">Log out</button>
+      </div>
     </div>
 
     <div class="summary-card">
@@ -69,6 +75,7 @@
       <div class="empty-state" id="emptyState" style="display: none;">No expenses yet. Add your first one above.</div>
     </div>
   </div>
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <script src="/js/dashboard.js"></script>
 </body>
 </html>

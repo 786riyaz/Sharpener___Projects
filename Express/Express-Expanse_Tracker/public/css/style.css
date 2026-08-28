@@ -150,6 +150,58 @@ button {
   border-color: var(--accent);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-premium {
+  background: #b8862f;
+  color: #fff;
+  padding: 8px 16px;
+}
+
+.btn-premium:hover {
+  background: #9c7126;
+}
+
+.premium-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: #8a6416;
+  background: #fbf1dd;
+  border: 1px solid #e9d3a1;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.payment-banner {
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.payment-banner.success {
+  background: #e7f0e9;
+  color: var(--accent-dark);
+  border: 1px solid #bcdcc7;
+}
+
+.payment-banner.failure {
+  background: #fbe9e7;
+  color: var(--danger);
+  border: 1px solid #f0c4bd;
+}
+
+.payment-banner.pending {
+  background: #fef7e6;
+  color: #8a6416;
+  border: 1px solid #e9d3a1;
+}
+
 .summary-card {
   background: var(--accent);
   color: #fff;
