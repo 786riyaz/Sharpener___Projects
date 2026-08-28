@@ -33,8 +33,10 @@ const expanseController = {
     try {
       const expanses = await Expanse.findAll({
         where: { userId: req.userId },
+        attributes:['category','description','amount', 'createdAt'],
         order: [["createdAt", "DESC"]],
       });
+      // console.log("Expanses ::: ",expanses);
       res.status(200).json(expanses);
     } catch (error) {
       console.error("Get expanse error:", error);

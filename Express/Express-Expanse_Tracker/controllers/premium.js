@@ -10,7 +10,7 @@ const premiumController = {
     try {
       const rows = await User.findAll({
         attributes: [
-          "id",
+          // "id",
           "name",
           [
             sequelize.fn("COALESCE", sequelize.fn("SUM", sequelize.col("expanses.amount")), 0),
@@ -28,6 +28,7 @@ const premiumController = {
         order: [[sequelize.literal("totalExpense"), "DESC"]],
         raw: true,
       });
+      // console.log("Rows ::", rows);
 
       const leaderboard = rows.map((row) => ({
         id: row.id,

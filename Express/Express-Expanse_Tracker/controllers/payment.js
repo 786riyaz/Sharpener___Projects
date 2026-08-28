@@ -21,7 +21,10 @@ const paymentController = {
   // and returns the payment_session_id the frontend needs to open checkout.
   createOrder: async (req, res) => {
     try {
-      const user = await User.findByPk(req.userId);
+      const user = await User.findByPk(req.userId, {
+        attributes: ["id", "name", "email"],
+      });
+      // console.log("User ::", user);
       if (!user) {
         return res.status(404).json({ error: "User not found." });
       }
@@ -91,7 +94,11 @@ const paymentController = {
     try {
       const { orderId } = req.params;
 
-      const order = await Order.findOne({ where: { orderId } });
+      const order = await Order.findOne({
+        where: { orderId },
+        attributes: ["orderId", "userId", "status", "expiresAt"],
+      });
+      // console.log("Order ::", order);
       if (!order) {
         return res.status(404).json({ error: "Order not found." });
       }
