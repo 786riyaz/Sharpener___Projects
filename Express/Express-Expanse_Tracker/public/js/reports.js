@@ -16,10 +16,21 @@ const viewTabs = document.getElementById("viewTabs");
 const totalIncomeEl = document.getElementById("totalIncome");
 const totalExpenseEl = document.getElementById("totalExpense");
 const totalSavingsEl = document.getElementById("totalSavings");
+const allExpensesPagination = document.getElementById("allExpensesPagination");
+const allPrevPageBtn = document.getElementById("allPrevPageBtn");
+const allNextPageBtn = document.getElementById("allNextPageBtn");
+const allPageInfo = document.getElementById("allPageInfo");
 
 let allExpenses = [];
 let currentView = "daily";
 let isPremiumUser = false;
+
+// "All Expenses" tab pagination - independent of the Daily/Weekly/Monthly
+// views above, which need the FULL unpaginated `allExpenses` array to
+// compute correct totals/subtotals.
+const ALL_PAGE_SIZE = 10;
+let allViewPage = 1;
+let allViewTotalPages = 1;
 
 // Categories that represent money coming in. The Expanse model doesn't
 // have an explicit income/expense flag yet, so - matching how "Salary"
@@ -128,6 +139,7 @@ function weekRangeLabel(dates) {
 function renderCurrentView() {
   reportTables.innerHTML = "";
   computeOverallTotals();
+  allExpensesPagination.style.display = "none";
 
   if (allExpenses.length === 0) {
     reportEmpty.style.display = "block";
@@ -137,8 +149,61 @@ function renderCurrentView() {
 
   if (currentView === "daily") renderDaily();
   else if (currentView === "weekly") renderWeekly();
-  else renderMonthly();
+  else if (currentView === "monthly") renderMonthly();
+  else loadAllExpensesPage(1);
 }
+
+// --- "All Expenses" tab: flat, paginated list (10 per page) ---
+async function loadAllExpensesPage(page) {
+  try {
+    const res = await fetch(`/expanse?page=${page}&limit=${ALL_PAGE_SIZE}`);
+    if (!res.ok) throw new Error("Failed to load expenses.");
+    const data = await res.json();
+    allViewPage = data.currentPage;
+    allViewTotalPages = data.totalPages;
+    renderAllExpensesTable(data.expenses);
+    renderAllExpensesPagination(data.totalCount);
+  } catch (err) {
+    reportEmpty.textContent = err.message;
+    reportEmpty.style.display = "block";
+  }
+}
+
+function renderAllExpensesTable(expenses) {
+  let rowsHtml = "";
+  expenses.forEach((exp) => {
+    const income = isIncome(exp);
+    rowsHtml += `
+      <tr>
+        <td>${new Date(exp.createdAt).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" })}</td>
+        <td>${escapeHtml(exp.description)}</td>
+        <td>${escapeHtml(exp.category)}</td>
+        <td class="amount-cell">${income ? money(exp.amount) : ""}</td>
+        <td class="amount-cell expense-amount">${income ? "" : money(exp.amount)}</td>
+      </tr>`;
+  });
+  reportTables.innerHTML = `
+    <table class="report-table">
+      <thead>
+        <tr><th>Date</th><th>Description</th><th>Category</th><th>Income</th><th>Expense</th></tr>
+      </thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>`;
+}
+
+function renderAllExpensesPagination(totalCount) {
+  allExpensesPagination.style.display = "flex";
+  allPageInfo.textContent = `Page ${allViewPage} of ${allViewTotalPages} (${totalCount} total)`;
+  allPrevPageBtn.disabled = allViewPage <= 1;
+  allNextPageBtn.disabled = allViewPage >= allViewTotalPages;
+}
+
+allPrevPageBtn.addEventListener("click", () => {
+  if (allViewPage > 1) loadAllExpensesPage(allViewPage - 1);
+});
+allNextPageBtn.addEventListener("click", () => {
+  if (allViewPage < allViewTotalPages) loadAllExpensesPage(allViewPage + 1);
+});
 
 function computeOverallTotals() {
   let income = 0;

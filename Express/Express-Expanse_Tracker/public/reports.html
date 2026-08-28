@@ -50,12 +50,18 @@
                         <button class="tab-btn active" data-view="daily">Daily</button>
                         <button class="tab-btn" data-view="weekly">Weekly</button>
                         <button class="tab-btn" data-view="monthly">Monthly</button>
+                        <button class="tab-btn" data-view="all">All Expenses</button>
                     </div>
                     <button id="downloadBtn" class="btn-primary report-download-btn" title="Download report">&#8681;
                         Download</button>
                 </div>
                 <div class="empty-state" id="reportEmpty" style="display: none;">No expenses recorded yet.</div>
                 <div id="reportTables"></div>
+                <div class="pagination" id="allExpensesPagination" style="display: none;">
+                    <button id="allPrevPageBtn" class="btn-page" type="button">&larr; Prev</button>
+                    <span id="allPageInfo" class="page-info"></span>
+                    <button id="allNextPageBtn" class="btn-page" type="button">Next &rarr;</button>
+                </div>
             </div>
 
         </div>
