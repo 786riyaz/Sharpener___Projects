@@ -285,3 +285,37 @@ window.addEventListener("pageshow", (event) => {
     checkAuth();
   }
 });
+
+let debounceTimer;
+document.getElementById("description").addEventListener("input", (e) => {
+  clearTimeout(debounceTimer);
+  const description = e.target.value;
+  if (description.trim().length < 3) return;
+
+  debounceTimer = setTimeout(async () => {
+    try {
+      const res = await fetch("/expanse/suggest-category", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description }),
+      });
+      const data = await res.json();
+      if (res.ok) document.getElementById("category").value = data.category;
+    } catch (err) {
+      console.error("AI suggestion failed:", err);
+    }
+  }, 600); // wait for the user to pause typing
+});
+
+// Optional: an "AI Tip" card fetched once the dashboard loads.
+async function loadInsight() {
+  try {
+    console.log("Calling AI Insight");
+    const res = await fetch("/expanse/insights");
+    const data = await res.json();
+    document.getElementById("ai-tip").textContent = data.insight;
+  } catch (err) {
+    console.error("Failed to load AI insight:", err);
+  }
+}
+loadInsight();
