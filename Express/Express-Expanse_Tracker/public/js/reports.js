@@ -20,6 +20,7 @@ const allExpensesPagination = document.getElementById("allExpensesPagination");
 const allPrevPageBtn = document.getElementById("allPrevPageBtn");
 const allNextPageBtn = document.getElementById("allNextPageBtn");
 const allPageInfo = document.getElementById("allPageInfo");
+const allPageSizeSelect = document.getElementById("allPageSizeSelect");
 
 let allExpenses = [];
 let currentView = "daily";
@@ -27,10 +28,39 @@ let isPremiumUser = false;
 
 // "All Expenses" tab pagination - independent of the Daily/Weekly/Monthly
 // views above, which need the FULL unpaginated `allExpenses` array to
-// compute correct totals/subtotals.
-const ALL_PAGE_SIZE = 10;
+// compute correct totals/subtotals. Page size is user-configurable and
+// shared with the dashboard's preference via the same localStorage key.
+const PAGE_SIZE_STORAGE_KEY = "expanseTracker:pageSize";
+const PAGE_SIZE_OPTIONS = [5, 8, 10, 15, 20, 25, 30, 40];
+const DEFAULT_PAGE_SIZE = 10;
+let allViewPageSize = getStoredPageSize();
 let allViewPage = 1;
 let allViewTotalPages = 1;
+
+function getStoredPageSize() {
+  try {
+    const stored = parseInt(localStorage.getItem(PAGE_SIZE_STORAGE_KEY), 10);
+    return PAGE_SIZE_OPTIONS.includes(stored) ? stored : DEFAULT_PAGE_SIZE;
+  } catch {
+    return DEFAULT_PAGE_SIZE;
+  }
+}
+function setStoredPageSize(size) {
+  try {
+    localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(size));
+  } catch {
+    // localStorage unavailable - preference just won't persist this session.
+  }
+}
+function initPageSizeSelect() {
+  allPageSizeSelect.innerHTML = PAGE_SIZE_OPTIONS.map((n) => `<option value="${n}">${n}</option>`).join("");
+  allPageSizeSelect.value = String(allViewPageSize);
+}
+allPageSizeSelect.addEventListener("change", () => {
+  allViewPageSize = parseInt(allPageSizeSelect.value, 10) || DEFAULT_PAGE_SIZE;
+  setStoredPageSize(allViewPageSize);
+  loadAllExpensesPage(1);
+});
 
 // Categories that represent money coming in. The Expanse model doesn't
 // have an explicit income/expense flag yet, so - matching how "Salary"
@@ -59,6 +89,7 @@ async function checkAuthAndLoad() {
     lockedCard.style.display = "none";
     reportContent.style.display = "block";
     setDownloadEnabled(true);
+    initPageSizeSelect();
     await loadExpenses();
     renderCurrentView();
   } catch {
@@ -156,7 +187,7 @@ function renderCurrentView() {
 // --- "All Expenses" tab: flat, paginated list (10 per page) ---
 async function loadAllExpensesPage(page) {
   try {
-    const res = await fetch(`/expanse?page=${page}&limit=${ALL_PAGE_SIZE}`);
+    const res = await fetch(`/expanse?page=${page}&limit=${allViewPageSize}`);
     if (!res.ok) throw new Error("Failed to load expenses.");
     const data = await res.json();
     allViewPage = data.currentPage;

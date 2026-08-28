@@ -489,3 +489,30 @@ td {
   min-width: 90px;
   text-align: center;
 }
+.page-size-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  color: var(--muted);
+  margin-left: auto;
+}
+.page-size-select {
+  width: auto;
+  padding: 5px 8px;
+  font-size: 13.5px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+}
+@media (max-width: 560px) {
+  .pagination {
+    flex-wrap: wrap;
+  }
+  .page-size-label {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+  }
+}

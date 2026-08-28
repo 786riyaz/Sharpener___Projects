@@ -18,9 +18,40 @@ const paginationEl = document.getElementById("pagination");
 const prevPageBtn = document.getElementById("prevPageBtn");
 const nextPageBtn = document.getElementById("nextPageBtn");
 const pageInfo = document.getElementById("pageInfo");
-const PAGE_SIZE = 10;
+const pageSizeSelect = document.getElementById("pageSizeSelect");
+// How many expenses to show per page - user-configurable (small screens
+// may want 5, big screens 40), remembered across visits via localStorage.
+const PAGE_SIZE_STORAGE_KEY = "expanseTracker:pageSize";
+const PAGE_SIZE_OPTIONS = [5, 8, 10, 15, 20, 25, 30, 40];
+const DEFAULT_PAGE_SIZE = 10;
+let pageSize = getStoredPageSize();
 let currentPage = 1;
 let totalPages = 1;
+function getStoredPageSize() {
+  try {
+    const stored = parseInt(localStorage.getItem(PAGE_SIZE_STORAGE_KEY), 10);
+    return PAGE_SIZE_OPTIONS.includes(stored) ? stored : DEFAULT_PAGE_SIZE;
+  } catch {
+    return DEFAULT_PAGE_SIZE;
+  }
+}
+function setStoredPageSize(size) {
+  try {
+    localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(size));
+  } catch {
+    // localStorage unavailable (e.g. private browsing) - fail silently,
+    // the preference just won't persist across reloads this session.
+  }
+}
+function initPageSizeSelect() {
+  pageSizeSelect.innerHTML = PAGE_SIZE_OPTIONS.map((n) => `<option value="${n}">${n}</option>`).join("");
+  pageSizeSelect.value = String(pageSize);
+}
+pageSizeSelect.addEventListener("change", () => {
+  pageSize = parseInt(pageSizeSelect.value, 10) || DEFAULT_PAGE_SIZE;
+  setStoredPageSize(pageSize);
+  loadExpenses(1); // preference changed - start back at page 1
+});
 // Step 1: check whether this visitor is actually logged in.
 // If not, they're bounced to the login page - the dashboard is never shown.
 async function checkAuth() {
@@ -33,6 +64,7 @@ async function checkAuth() {
     }
     welcomeMsg.textContent = `Welcome, ${data.user.name}`;
     updatePremiumUI(data.user.isPremium);
+    initPageSizeSelect();
     loadExpenses();
     handlePaymentReturn();
   } catch {
@@ -57,7 +89,7 @@ function updatePremiumUI(isPremium) {
 // and whenever Prev/Next is clicked.
 async function loadExpenses(page = 1) {
   try {
-    const res = await fetch(`/expanse?page=${page}&limit=${PAGE_SIZE}`);
+    const res = await fetch(`/expanse?page=${page}&limit=${pageSize}`);
     if (!res.ok) throw new Error("Failed to load expenses.");
     const data = await res.json();
     currentPage = data.currentPage;
