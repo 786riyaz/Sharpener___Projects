@@ -1,7 +1,7 @@
 // index.js
 import express from "express";
 import path from "node:path";
-import cookieParser from "cookie-parser";
+import session from "express-session";
 import sequelize from "./models/index.js"; // also registers the User <-> Expanse association
 import userRouter from "./routes/user.js";
 import expanseRouter from "./routes/expanse.js";
@@ -10,9 +10,18 @@ const app = express();
 
 app.use(express.json());
 
-// Lets Express read the httpOnly "token" cookie (containing the JWT) off
-// incoming requests, via req.cookies.token.
-app.use(cookieParser());
+// Session middleware - this is what lets the server "remember" a logged-in
+// user between requests via a cookie, without the frontend managing tokens.
+app.use(
+  session({
+    secret: "expanse-tracker-secret-key", // move this to an environment variable in production
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // session lasts 1 day
+    },
+  }),
+);
 
 app.use(
   express.static(path.join(import.meta.dirname, "public"), {

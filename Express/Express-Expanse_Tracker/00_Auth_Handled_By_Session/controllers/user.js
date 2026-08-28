@@ -1,9 +1,7 @@
 // controllers/user.js
 import path from "node:path";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import { JWT_SECRET, JWT_EXPIRES_IN } from "../config/jwt.js";
 
 const userController = {
   getRegisterForm: function (req, res) {
@@ -52,21 +50,10 @@ const userController = {
         return res.status(401).send("Invalid email or password.");
       }
 
-      // Log the user in by issuing a signed JWT and storing it as an
-      // httpOnly cookie. The browser sends this cookie automatically on
-      // every later request - the server never has to remember anything
-      // itself (unlike sessions), it just verifies the token each time.
-      const token = jwt.sign(
-        { userId: user.id, name: user.name },
-        JWT_SECRET,
-        { expiresIn: JWT_EXPIRES_IN },
-      );
-
-      res.cookie("token", token, {
-        httpOnly: true, // not readable/writable from JS in the browser - protects against XSS token theft
-        sameSite: "lax",
-        maxAge: 1000 * 60 * 60 * 24, // 1 day, matches JWT_EXPIRES_IN
-      });
+      // Log the user in by storing their id in the session.
+      // Every later request that carries the session cookie is now "logged in".
+      req.session.userId = user.id;
+      req.session.userName = user.name;
 
       res.status(200).json({
         message: "Login successful",
@@ -79,26 +66,26 @@ const userController = {
   },
 
   logout: function (req, res) {
-    res.clearCookie("token");
-    res.status(200).json({ message: "Logged out successfully." });
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Logout error:", err);
+        return res.status(500).json({ error: "Could not log out." });
+      }
+      res.clearCookie("connect.sid");
+      res.status(200).json({ message: "Logged out successfully." });
+    });
   },
 
   // The frontend calls this on page load to decide whether to show
   // the expense dashboard or bounce the visitor to the login page.
   checkSession: function (req, res) {
-    const token = req.cookies.token;
-    if (!token) {
-      return res.status(200).json({ loggedIn: false });
-    }
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET);
+    if (req.session && req.session.userId) {
       return res.status(200).json({
         loggedIn: true,
-        user: { id: decoded.userId, name: decoded.name },
+        user: { id: req.session.userId, name: req.session.userName },
       });
-    } catch (error) {
-      return res.status(200).json({ loggedIn: false });
     }
+    res.status(200).json({ loggedIn: false });
   },
 };
 

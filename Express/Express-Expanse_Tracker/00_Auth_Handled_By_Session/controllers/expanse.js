@@ -18,7 +18,7 @@ const expanseController = {
         category,
         description,
         amount: Number(amount),
-        userId: req.userId,
+        userId: req.session.userId,
       });
 
       res.status(201).json(expanse);
@@ -32,7 +32,7 @@ const expanseController = {
   getExpanse: async (req, res) => {
     try {
       const expanses = await Expanse.findAll({
-        where: { userId: req.userId },
+        where: { userId: req.session.userId },
         order: [["createdAt", "DESC"]],
       });
       res.status(200).json(expanses);
@@ -47,7 +47,7 @@ const expanseController = {
     try {
       const { id } = req.params;
       const deletedCount = await Expanse.destroy({
-        where: { id, userId: req.userId },
+        where: { id, userId: req.session.userId },
       });
       if (deletedCount === 0) {
         return res.status(404).json({ error: "Expense not found." });
