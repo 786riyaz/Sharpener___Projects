@@ -8,6 +8,7 @@ import expanseRouter from "./routes/expanse.js";
 import paymentRouter from "./routes/payment.js";
 import premiumRouter from "./routes/premium.js";
 import passwordRouter from "./routes/password.js";
+import reportRouter from "./routes/report.js";
 import requestLogger from "./middleware/requestLogger.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
 import logger from "./utils/logger.js";
@@ -51,6 +52,7 @@ app.use("/expanse", expanseRouter);
 app.use("/payment", paymentRouter);
 app.use("/premium", premiumRouter);
 app.use("/password", passwordRouter);
+app.use("/report", reportRouter);
 app.get("/", (req, res) => {
   res.sendFile(path.join(import.meta.dirname, "public", "login.html"));
 });

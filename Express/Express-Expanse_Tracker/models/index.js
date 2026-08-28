@@ -3,6 +3,7 @@ import User from "./User.js";
 import Expanse from "./Expanse.js";
 import Order from "./Order.js";
 import ForgotPasswordRequest from "./ForgotPasswordRequest.js";
+import Report from "./Report.js";
 // One user can have many expenses
 User.hasMany(Expanse, {
 foreignKey: "userId",
@@ -30,5 +31,14 @@ ForgotPasswordRequest.belongsTo(User, {
 foreignKey: "userId",
 as: "user",
 });
-export { User, Expanse, Order, ForgotPasswordRequest };
+// One user can have many generated report files
+User.hasMany(Report, {
+foreignKey: "userId",
+as: "reports",
+});
+Report.belongsTo(User, {
+foreignKey: "userId",
+as: "user",
+});
+export { User, Expanse, Order, ForgotPasswordRequest, Report };
 export default sequelize;

@@ -60,6 +60,22 @@
                         per page</label>
                 </div>
             </div>
+            <div class="card">
+                <h2>Downloaded reports</h2>
+                <p id="downloadResult" class="muted" style="display: none;"></p>
+                <div class="empty-state" id="reportHistoryEmpty" style="display: none;">No reports downloaded yet.
+                </div>
+                <table id="reportHistoryTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th>Generated on</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportHistoryBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
     <script src="/js/reports.js"></script>

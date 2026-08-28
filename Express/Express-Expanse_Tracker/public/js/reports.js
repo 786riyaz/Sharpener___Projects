@@ -1,10 +1,10 @@
 // public/js/reports.js
-// Premium "Reports" feature - FRONTEND ONLY for now.
-// Reuses the existing GET /expanse endpoint (already available to any
-// logged-in user) and aggregates it client-side into daily / weekly /
-// monthly views. No new backend routes are introduced here - a future
-// task can swap loadExpenses()/buildDownloadFile() to call a dedicated
-// backend report/export endpoint without changing this page's markup.
+// Premium "Reports" feature. Daily/weekly/monthly/all views are still
+// aggregated client-side from GET /expanse. The "Download" button now
+// calls the backend, which builds a CSV of ALL of this user's expenses,
+// uploads it to S3, and returns a time-limited presigned URL - the file
+// itself never touches this server's disk. Past downloads are listed
+// below via GET /report/history (see routes/report.js).
 const premiumBadge = document.getElementById("premiumBadge");
 const lockedCard = document.getElementById("lockedCard");
 const reportContent = document.getElementById("reportContent");
@@ -20,6 +20,10 @@ const allPrevPageBtn = document.getElementById("allPrevPageBtn");
 const allNextPageBtn = document.getElementById("allNextPageBtn");
 const allPageInfo = document.getElementById("allPageInfo");
 const allPageSizeSelect = document.getElementById("allPageSizeSelect");
+const downloadResult = document.getElementById("downloadResult");
+const reportHistoryEmpty = document.getElementById("reportHistoryEmpty");
+const reportHistoryTable = document.getElementById("reportHistoryTable");
+const reportHistoryBody = document.getElementById("reportHistoryBody");
 let allExpenses = [];
 let currentView = "daily";
 let isPremiumUser = false;
@@ -84,6 +88,7 @@ async function checkAuthAndLoad() {
     initPageSizeSelect();
     await loadExpenses();
     renderCurrentView();
+    await loadReportHistory();
   } catch {
     window.location.href = "/login.html";
   }
@@ -368,33 +373,64 @@ function formatDate(dKey) {
     year: "numeric",
   });
 }
-// --- Download (client-side CSV for now; can be swapped for a backend
-// generated file - e.g. PDF/XLSX - in a future task without touching
-// the rest of this page) ---
-downloadBtn.addEventListener("click", () => {
+// --- Download: backend generates the CSV, uploads it to S3, and returns
+// a presigned URL. We show that URL (and open it) rather than building
+// the file in the browser. ---
+downloadBtn.addEventListener("click", async () => {
   if (downloadBtn.disabled || !isPremiumUser) return;
-  const rows = [["Date", "Description", "Category", "Income", "Expense"]];
-  allExpenses
-    .slice()
-    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-    .forEach((exp) => {
-      const income = isIncome(exp);
-      rows.push([new Date(exp.createdAt).toLocaleDateString(), exp.description, exp.category, income ? Number(exp.amount).toFixed(2) : "", income ? "" : Number(exp.amount).toFixed(2)]);
-    });
-  const csv = rows.map((r) => r.map(csvEscape).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `expense-report-${currentView}-${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+  downloadBtn.disabled = true;
+  const originalLabel = downloadBtn.textContent;
+  downloadBtn.textContent = "Generating...";
+  downloadResult.style.display = "none";
+  try {
+    const res = await fetch("/report/generate");
+    if (res.status === 401) {
+      downloadResult.textContent = "This feature is available to Premium members only.";
+      downloadResult.style.display = "block";
+      return;
+    }
+    if (!res.ok) throw new Error("Failed to generate report.");
+    const { fileUrl, fileName } = await res.json();
+    downloadResult.innerHTML = `Report ready: <a href="${fileUrl}" target="_blank" rel="noopener">${fileName}</a>`;
+    downloadResult.style.display = "block";
+    window.open(fileUrl, "_blank", "noopener");
+    await loadReportHistory();
+  } catch {
+    downloadResult.textContent = "Something went wrong generating your report. Please try again.";
+    downloadResult.style.display = "block";
+  } finally {
+    downloadBtn.disabled = false;
+    downloadBtn.textContent = originalLabel;
+  }
 });
-function csvEscape(value) {
-  const str = String(value ?? "");
-  return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+// --- Past downloads list (bonus task) ---
+async function loadReportHistory() {
+  try {
+    const res = await fetch("/report/history");
+    if (!res.ok) throw new Error("Failed to load report history.");
+    const history = await res.json();
+    if (!history.length) {
+      reportHistoryTable.style.display = "none";
+      reportHistoryEmpty.style.display = "block";
+      return;
+    }
+    reportHistoryEmpty.style.display = "none";
+    reportHistoryTable.style.display = "table";
+    reportHistoryBody.innerHTML = history
+      .map(
+        (r) => `
+        <tr>
+          <td>${r.fileName}</td>
+          <td>${new Date(r.generatedAt).toLocaleString()}</td>
+          <td><a href="${r.fileUrl}" target="_blank" rel="noopener">Download</a></td>
+        </tr>`,
+      )
+      .join("");
+  } catch {
+    reportHistoryEmpty.textContent = "Couldn't load past reports.";
+    reportHistoryEmpty.style.display = "block";
+    reportHistoryTable.style.display = "none";
+  }
 }
 checkAuthAndLoad();
 // Re-check premium status when the page is restored from bfcache, same
