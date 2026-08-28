@@ -1,34 +1,23 @@
 // controllers/premium.js
-import sequelize from "../config/db.js";
-import { User, Expanse } from "../models/index.js";
+import { User } from "../models/index.js";
 
 const premiumController = {
   // GET /premium/leaderboard
   // Every user, with their total expense, ranked highest spender first.
-  // Users with no expenses at all still show up with a total of 0.
+  // Users with no expenses at all still show up with a total of 0
+  // (totalExpense defaults to 0 on the User model).
+  //
+  // No JOIN or SUM anymore - User.totalExpense is kept in sync by
+  // expanseController.addExpanse / deleteExpanse on every write, so this
+  // is just a plain indexed read + sort.
   getLeaderBoard: async (req, res) => {
     try {
       const rows = await User.findAll({
-        attributes: [
-          // "id",
-          "name",
-          [
-            sequelize.fn("COALESCE", sequelize.fn("SUM", sequelize.col("expanses.amount")), 0),
-            "totalExpense",
-          ],
-        ],
-        include: [
-          {
-            model: Expanse,
-            as: "expanses",
-            attributes: [],
-          },
-        ],
-        group: ["User.id", "User.name"],
-        order: [[sequelize.literal("totalExpense"), "DESC"]],
+        // attributes: ["id", "name", "totalExpense"],
+        attributes: ["name", "totalExpense"],
+        order: [["totalExpense", "DESC"]],
         raw: true,
       });
-      // console.log("Rows ::", rows);
 
       const leaderboard = rows.map((row) => ({
         id: row.id,
