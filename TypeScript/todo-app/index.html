@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do List</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="app__header">
+      <h1>To-Do List</h1>
+      <p class="app__subtitle">Add tasks, set due dates, check them off.</p>
+    </header>
+
+    <form id="task-form" class="task-form" novalidate>
+      <div class="task-form__row">
+        <label for="task-name" class="visually-hidden">Task name</label>
+        <input
+          type="text"
+          id="task-name"
+          name="task-name"
+          placeholder="What needs to be done?"
+          autocomplete="off"
+          required
+        />
+
+        <label for="task-due" class="visually-hidden">Due date</label>
+        <input type="date" id="task-due" name="task-due" required />
+
+        <button type="submit" class="btn btn--primary">Add</button>
+      </div>
+      <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
+    </form>
+
+    <div class="task-toolbar">
+      <span id="task-count" class="task-count">0 tasks</span>
+      <div class="task-filters" role="group" aria-label="Filter tasks">
+        <button type="button" class="filter-btn is-active" data-filter="all">All</button>
+        <button type="button" class="filter-btn" data-filter="pending">Pending</button>
+        <button type="button" class="filter-btn" data-filter="completed">Completed</button>
+      </div>
+    </div>
+
+    <ul id="task-list" class="task-list"></ul>
+
+    <p id="empty-state" class="empty-state">No tasks yet — add your first one above.</p>
+  </main>
+
+  <script src="dist/app.js"></script>
+</body>
+</html>
