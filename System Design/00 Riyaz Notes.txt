@@ -1,0 +1,5 @@
+Horizontal Scalling VS Vertical Scalling
+
+Anti Pattern :: Databases As Message Queue
+
+Monolith VS MicroServices
