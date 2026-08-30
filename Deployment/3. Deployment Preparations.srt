@@ -1,0 +1,227 @@
+1
+00:00:02,600 --> 00:00:06,510
+How do we then prepare the code for production?
+
+2
+00:00:06,560 --> 00:00:11,140
+Now this obviously always depends on the kind of application you're building.
+
+3
+00:00:11,450 --> 00:00:16,790
+In general, you want to use something which is called environment variables and I will show you what
+
+4
+00:00:16,790 --> 00:00:17,240
+this is
+
+5
+00:00:17,230 --> 00:00:23,990
+in our concrete projects in this module, no worries. Use environment variables instead of hardcoding
+
+6
+00:00:23,990 --> 00:00:26,550
+certain values like API keys,
+
+7
+00:00:26,690 --> 00:00:30,790
+port numbers, passwords and so on into your code.
+
+8
+00:00:31,040 --> 00:00:37,370
+Also make sure that if you are using some third party services like stripe, that you use the production
+
+9
+00:00:37,370 --> 00:00:44,750
+API keys and not the development keys, for example stripe which we used gave us a testing API key while
+
+10
+00:00:44,810 --> 00:00:50,540
+that is obviously what we want to use as long as we test the application, as soon as we deploy it
+
+11
+00:00:50,690 --> 00:00:53,050
+we want to use the production ready API
+
+12
+00:00:53,300 --> 00:00:59,180
+and that is something that also depends on the third parties or on the third party APIs you might be
+
+13
+00:00:59,180 --> 00:01:01,040
+using.
+
+14
+00:01:01,070 --> 00:01:08,910
+Now we also might have some mechanisms to handle errors or to log something and there we want to make sure
+
+15
+00:01:08,910 --> 00:01:12,150
+that we reduce the error output details.
+
+16
+00:01:12,330 --> 00:01:15,060
+We don't want to send sensitive info to our users,
+
+17
+00:01:15,240 --> 00:01:23,130
+so if something fails, if some error message is thrown, we want to make sure that it does contain as little
+
+18
+00:01:23,130 --> 00:01:29,130
+information as possible because the users of our website should of course not get any insights into
+
+19
+00:01:29,130 --> 00:01:30,720
+our source code.
+
+20
+00:01:30,720 --> 00:01:37,380
+Now by default and in the way we build this project or these projects in this course, we'll not have problems
+
+21
+00:01:37,380 --> 00:01:44,790
+with that because if we use the default express error handling middleware and the default errors and
+
+22
+00:01:44,790 --> 00:01:49,190
+the custom errors we build also don't contain any sensitive information,
+
+23
+00:01:49,380 --> 00:01:56,930
+then we are fine but if you're building an application where you create your own error objects, maybe
+
+24
+00:01:56,940 --> 00:02:03,000
+with a lot of data added to them, you should make sure to strip some of that data out of these custom
+
+25
+00:02:03,000 --> 00:02:03,590
+errors
+
+26
+00:02:03,690 --> 00:02:11,040
+when you deploy your application or when you prepare your application for deployment. Regarding the responses
+
+27
+00:02:11,040 --> 00:02:17,270
+your application sends, you want to make sure that you set secure response headers.
+
+28
+00:02:17,280 --> 00:02:24,910
+There are some response headers, some headers you can add to any response which don't hurt, which prevent
+
+29
+00:02:24,940 --> 00:02:30,600
+the clients from doing certain things, certain things and so on and therefore setting these
+
+30
+00:02:30,600 --> 00:02:31,880
+headers won't hurt
+
+31
+00:02:32,100 --> 00:02:37,650
+and I will show you in this module how to easily set these headers and how to find out which headers
+
+32
+00:02:37,860 --> 00:02:38,620
+that are,
+
+33
+00:02:38,620 --> 00:02:41,120
+so we'll implement some best practices there.
+
+34
+00:02:42,390 --> 00:02:50,790
+Now in a typical node application, you might also be serving some assets, some javascript, some css
+
+35
+00:02:50,790 --> 00:02:59,070
+files and there, adding compression can be a good idea because that will reduce your response size
+
+36
+00:02:59,370 --> 00:03:05,000
+or therefore also your response time because the client has to download less
+
+37
+00:03:05,130 --> 00:03:13,020
+and most modern browsers and so on are able to download compressed, so zipped assets and unzip them on
+
+38
+00:03:13,020 --> 00:03:15,030
+the fly directly in the browser,
+
+39
+00:03:15,120 --> 00:03:20,480
+so this is not some fancy mechanism where you would have to do a lot of manual coding,
+
+40
+00:03:20,490 --> 00:03:25,790
+it's actually pretty straightforward and the browser does a lot of the work for you.
+
+41
+00:03:25,920 --> 00:03:31,090
+You also want to configure logging so that you are aware of what's happening on your server.
+
+42
+00:03:31,140 --> 00:03:36,780
+Since we're now not testing the server anymore but real users do interact with it, we certainly want
+
+43
+00:03:36,780 --> 00:03:41,150
+to log interactions into log files that we can look into at any time
+
+44
+00:03:41,160 --> 00:03:42,580
+we feel like it.
+
+45
+00:03:43,110 --> 00:03:48,160
+So there, that is another thing we want to add so that we can stay up to date about what's happening.
+
+46
+00:03:48,630 --> 00:03:52,060
+And last but not least, ssl/tls,
+
+47
+00:03:52,080 --> 00:03:58,530
+so encryption of data in transit is also something we might want to look into. Thus far in this course
+
+48
+00:03:58,530 --> 00:04:04,410
+we used the normal http server and therefore our communication with the server was not encrypted, for
+
+49
+00:04:04,410 --> 00:04:06,260
+testing this is obviously fine,
+
+50
+00:04:06,360 --> 00:04:12,480
+now for a production ready app, it's strongly recommended that you do encrypt your connections and therefore
+
+51
+00:04:12,480 --> 00:04:18,590
+I will also show you how to turn that on in your node express application in this module.
+
+52
+00:04:18,600 --> 00:04:26,370
+It's also worth mentioning that the last three points here, compression logging and ssl are often handled
+
+53
+00:04:26,370 --> 00:04:32,400
+by your hosting provider and I will talk about that when we choose a hosting provider because often
+
+54
+00:04:32,420 --> 00:04:39,490
+or typically, you want to use some managed service where these things are also managed for you so that
+
+55
+00:04:39,550 --> 00:04:41,600
+you don't have to worry too much about that.
+
+56
+00:04:41,760 --> 00:04:47,430
+I'll still show you how to enable it manually but it might be worth noting that you probably don't have
+
+57
+00:04:47,430 --> 00:04:50,340
+to do that when deploying your application.

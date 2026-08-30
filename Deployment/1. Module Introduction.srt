@@ -1,0 +1,59 @@
+1
+00:00:02,280 --> 00:00:04,830
+You did it. You built an amazing nodejs
+
+2
+00:00:04,850 --> 00:00:11,640
+application and in this course, we actually build a couple of applications and we're typically
+
+3
+00:00:11,640 --> 00:00:19,590
+not just doing this for our own practice or to do it on our PC only, instead we of course want to deploy
+
+4
+00:00:19,620 --> 00:00:23,930
+this application into the web so that it is reachable by other people
+
+5
+00:00:24,000 --> 00:00:28,450
+because as long as it's running on localhost, only you can reach it
+
+6
+00:00:28,470 --> 00:00:31,590
+and that is the idea during development of course.
+
+7
+00:00:31,680 --> 00:00:38,490
+Now in this module, we'll move from development to production and you will learn how we can prepare
+
+8
+00:00:38,490 --> 00:00:40,480
+our project for deployment.
+
+9
+00:00:40,590 --> 00:00:46,350
+There are some things we just want to adjust or where we want to make sure that we don't skip them.
+
+10
+00:00:46,680 --> 00:00:53,190
+We'll then of course also walk through all the important steps and the configuration you need to do to
+
+11
+00:00:53,220 --> 00:00:56,110
+deploy your project to a hosting provider
+
+12
+00:00:56,370 --> 00:01:03,600
+and we'll talk about security because that obviously is connected to deploying your app because as soon
+
+13
+00:01:03,600 --> 00:01:09,600
+as it does not run on your own computer anymore, you obviously have to make sure that some things just
+
+14
+00:01:09,600 --> 00:01:11,240
+are, well secure.
+
+15
+00:01:11,520 --> 00:01:14,390
+So let's dive into all these things in this module.

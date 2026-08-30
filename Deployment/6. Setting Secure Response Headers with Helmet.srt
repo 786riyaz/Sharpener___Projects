@@ -1,0 +1,119 @@
+1
+00:00:02,390 --> 00:00:05,900
+Now we already prepared some things for production,
+
+2
+00:00:05,900 --> 00:00:13,010
+let me now dive into that secure headers thing and for that, we'll use a third party package which is called
+
+3
+00:00:13,070 --> 00:00:17,810
+helmet and you can use it to secure your node express applications.
+
+4
+00:00:17,840 --> 00:00:23,320
+Now you can dive into the official docs of this package to learn more about it
+
+5
+00:00:23,450 --> 00:00:29,840
+and in the end what this will do is this package will add certain headers to the responses you sent
+
+6
+00:00:29,840 --> 00:00:33,190
+back and it follows best practices for doing so,
+
+7
+00:00:33,230 --> 00:00:40,280
+you'll see which attack patterns or which security issues these are against which it protects you by
+
+8
+00:00:40,280 --> 00:00:41,570
+setting the right headers.
+
+9
+00:00:41,570 --> 00:00:47,570
+So definitely check that out to learn more about these headers and why it protects you against that,
+
+10
+00:00:47,990 --> 00:00:49,090
+using the package
+
+11
+00:00:49,160 --> 00:00:50,550
+is very easy though.
+
+12
+00:00:50,810 --> 00:00:58,640
+In your project, you just run and install --save helmet and then this will be downloaded and
+
+13
+00:00:58,640 --> 00:01:03,950
+you can use it as you see here by simply including it as a middleware and then it will automatically
+
+14
+00:01:03,950 --> 00:01:09,860
+run on all incoming requests and therefore also have a chance of adjusting the responses as you
+
+15
+00:01:09,860 --> 00:01:10,420
+learned
+
+16
+00:01:10,550 --> 00:01:19,130
+and it will then set its headers. So you can simply go to your app.js file then and there, import helmet
+
+17
+00:01:19,220 --> 00:01:22,050
+by requiring it like this
+
+18
+00:01:22,170 --> 00:01:29,010
+and then as a next step, you simply add this line here after you initialized your express app, maybe
+
+19
+00:01:29,160 --> 00:01:34,000
+in the place where we then also set up all our other middleware down there.
+
+20
+00:01:34,020 --> 00:01:40,110
+Here we can use app use helmet and execute this as a function, and this is it.
+
+21
+00:01:40,110 --> 00:01:48,710
+Now with that, if I run npm run start:dev, my new script I added to use nodemon,
+
+22
+00:01:48,930 --> 00:01:57,790
+everything runs as before but now actually if I visit localhost 3000 here and I hope my network tab
+
+23
+00:01:58,040 --> 00:02:05,810
+and I reload this page, I can see that on this response, I have a couple of headers being set and there are
+
+24
+00:02:05,810 --> 00:02:13,400
+some special headers which were added by helmet here and you can always check that by temporarily commenting
+
+25
+00:02:13,520 --> 00:02:17,640
+out helmet, we'll automatically restart since I'm using nodemon,
+
+26
+00:02:17,750 --> 00:02:22,430
+we had 11 response headers before, if I now reload this,
+
+27
+00:02:22,550 --> 00:02:26,960
+we just have 6 because now some special headers are missing.
+
+28
+00:02:27,140 --> 00:02:29,570
+And that is something you should consider doing,
+
+29
+00:02:29,630 --> 00:02:33,770
+read through the official docs to learn all about the headers
+
+30
+00:02:33,800 --> 00:02:38,810
+it is adding but it's definitely worth looking at that and probably worth using that.

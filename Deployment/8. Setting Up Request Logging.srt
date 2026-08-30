@@ -1,0 +1,155 @@
+1
+00:00:02,250 --> 00:00:08,690
+Now we had a look at compression and headers, now logging is also something that matters. For that
+
+2
+00:00:08,700 --> 00:00:14,460
+I'll quit my server and I'll install a new package with npm install --save and that is called
+
+3
+00:00:14,460 --> 00:00:18,510
+morgan and that is a package that makes logging request data
+
+4
+00:00:18,540 --> 00:00:20,580
+really simple.
+
+5
+00:00:20,580 --> 00:00:30,600
+Now after adding it, I can, whoops, restart with npm run start dev, my nodemon server and now to use
+
+6
+00:00:30,600 --> 00:00:39,930
+morgan, I'll import it here in the app.js file, I'll require morgan like this and now we can use it as
+
+7
+00:00:39,930 --> 00:00:40,780
+a middleware,
+
+8
+00:00:40,990 --> 00:00:49,470
+also before we handle all the requests, so also maybe up here, we app use morgan and we execute this
+
+9
+00:00:49,500 --> 00:00:55,800
+as a function and pass the information on how to log this into this function.
+
+10
+00:00:55,800 --> 00:01:00,930
+Now you find more in the official docs, that simply defines which data is being logged and how it's formatted,
+
+11
+00:01:01,380 --> 00:01:02,900
+I'll go with combined
+
+12
+00:01:03,150 --> 00:01:13,360
+and now if I save that and I reload this page here, you'll find some logging data here in the console.
+
+13
+00:01:13,710 --> 00:01:19,440
+You see detailed logging information about the incoming request that we had a get request, which browser
+
+14
+00:01:19,440 --> 00:01:22,070
+I used which operating system and so on.
+
+15
+00:01:22,080 --> 00:01:26,930
+Now obviously we typically don't want to see that in the console when we deploy our application
+
+16
+00:01:26,970 --> 00:01:35,310
+instead some files would be nice and to log that to files, we just have to add something here,
+
+17
+00:01:35,640 --> 00:01:44,640
+we can create a new constant, the access log stream, use the node file system which is a core module which
+
+18
+00:01:44,640 --> 00:01:47,040
+we have to import by requiring
+
+19
+00:01:50,420 --> 00:01:52,500
+fs here
+
+20
+00:01:52,750 --> 00:01:58,620
+and now with that, we can create a write stream with create write stream
+
+21
+00:01:58,630 --> 00:02:07,450
+and this allows us to then define a path best with path join, seen from our current folder on to let's
+
+22
+00:02:07,450 --> 00:02:12,840
+say access.log so that we will write the logs into this file.
+
+23
+00:02:13,060 --> 00:02:18,650
+We will add a configuration here where I set flags to a which means append,
+
+24
+00:02:18,760 --> 00:02:24,790
+so new data will be appended to that file and not overwrite the existing file but add it at the end of
+
+25
+00:02:24,790 --> 00:02:30,160
+the file so that we don't just have one log statement in the file but we continuously add them to the
+
+26
+00:02:30,160 --> 00:02:31,240
+file
+
+27
+00:02:31,300 --> 00:02:37,720
+and now this write stream can be used by morgan and we simply pass that stream to morgan in a second
+
+28
+00:02:37,720 --> 00:02:46,120
+argument. Here we can set a stream value in that object and we set that, whoops, not here but in the morgan
+
+29
+00:02:46,600 --> 00:02:47,500
+function here,
+
+30
+00:02:47,770 --> 00:02:53,060
+so here we set the stream and we set that to our access log stream here.
+
+31
+00:02:54,010 --> 00:02:59,220
+And now this file stream will be used by morgan to log our requests and therefore now if I reload
+
+32
+00:02:59,230 --> 00:03:00,680
+this page,
+
+33
+00:03:00,820 --> 00:03:06,700
+we don't have the log here but we have this new access log file and in here, we see that log data and
+
+34
+00:03:06,700 --> 00:03:08,760
+that is of course how we would want to log that
+
+35
+00:03:08,800 --> 00:03:13,980
+but also as mentioned on the slide, often logging is done by our hosting providers
+
+36
+00:03:13,990 --> 00:03:20,890
+so then this might not matter for you. If you want or have to do it manually though, this is a nice package
+
+37
+00:03:21,070 --> 00:03:26,440
+where you can of course configure more as you can see in their official docs which allows you to log
+
+38
+00:03:26,650 --> 00:03:28,710
+your request data to files
+
+39
+00:03:28,780 --> 00:03:32,320
+so that you always know what's going on on your server.

@@ -1,0 +1,239 @@
+1
+00:00:02,350 --> 00:00:09,430
+Now that we learned a lot about how we prepare for deployment, let's finally deploy and for that, I will
+
+2
+00:00:09,430 --> 00:00:12,240
+use a hosting provider called heroku,
+
+3
+00:00:12,250 --> 00:00:13,570
+you can simply google for it,
+
+4
+00:00:13,570 --> 00:00:15,500
+you can get started with it for free,
+
+5
+00:00:15,580 --> 00:00:16,790
+it's a very popular one
+
+6
+00:00:16,870 --> 00:00:24,100
+but let me also say that there are dozens, hundreds, thousands of hosting providers you could use and
+
+7
+00:00:24,100 --> 00:00:26,100
+it's impossible to cover them all,
+
+8
+00:00:26,110 --> 00:00:32,140
+so I will try my best to show you the general steps of deployment and to explain how it works in
+
+9
+00:00:32,140 --> 00:00:33,100
+general.
+
+10
+00:00:33,100 --> 00:00:39,520
+So heroku is what I will use here and I will show you how to deploy to heroku in detail,
+
+11
+00:00:39,520 --> 00:00:40,950
+I already created an account,
+
+12
+00:00:40,960 --> 00:00:44,570
+you can do that by simply signing up, again
+
+13
+00:00:44,590 --> 00:00:45,860
+that is free
+
+14
+00:00:46,030 --> 00:00:52,120
+but first of all let me explain what heroku is and how we generally work with these hosting providers
+
+15
+00:00:52,990 --> 00:00:55,610
+because we use a hosting provider here,
+
+16
+00:00:55,650 --> 00:00:57,740
+heroku is a hosting provider.
+
+17
+00:00:57,970 --> 00:01:03,700
+The alternative always is that you build your own computer and you set it up such that it is connected
+
+18
+00:01:03,700 --> 00:01:10,210
+to the Internet, that you expose the right ports and that people can send requests to your computer
+
+19
+00:01:10,420 --> 00:01:16,720
+which might be running in your room and that is not a solution I recommend unless you really know what
+
+20
+00:01:16,720 --> 00:01:17,710
+you are doing
+
+21
+00:01:17,710 --> 00:01:22,370
+otherwise it's very likely to be insecure, not scalable at all,
+
+22
+00:01:22,390 --> 00:01:28,450
+if your app is doing really well then you will quickly need a new computer, a second computer, a third
+
+23
+00:01:28,450 --> 00:01:34,450
+computer and it only gets more complex and expensive and therefore, we typically use hosting providers
+
+24
+00:01:34,600 --> 00:01:44,170
+like heroku but also like AWS for example. There we take our code and we deploy it onto managed spaces
+
+25
+00:01:44,320 --> 00:01:51,640
+on their computers, also often called virtual servers and this means that these providers have very
+
+26
+00:01:52,000 --> 00:01:59,430
+large and powerful machines in their data centers and you typically don't rent an entire machine, though
+
+27
+00:01:59,440 --> 00:02:00,700
+you could do that
+
+28
+00:02:00,700 --> 00:02:02,760
+but a part on that machine,
+
+29
+00:02:02,800 --> 00:02:10,930
+so a part of the hard drive and some resources which are then provisioned for your managed space and your
+
+30
+00:02:10,930 --> 00:02:16,540
+code runs totally separated from the other apps which might be running on the same computer on the
+
+31
+00:02:16,540 --> 00:02:17,620
+same server,
+
+32
+00:02:17,800 --> 00:02:23,800
+your app runs separated from them and now you of course want to connect your app running on that virtual
+
+33
+00:02:23,800 --> 00:02:26,640
+server with your users.
+
+34
+00:02:26,650 --> 00:02:33,750
+Now typically you don't directly connect your space on that machine to your servers, though that is also
+
+35
+00:02:33,760 --> 00:02:35,490
+possible on some providers
+
+36
+00:02:35,620 --> 00:02:42,370
+but instead a lot of providers manage a lot of the heavy lifting for you and they give you their own
+
+37
+00:02:42,640 --> 00:02:49,090
+managed servers you could say in front of your server where you can conveniently add ssl encryption,
+
+38
+00:02:49,180 --> 00:02:55,360
+compression, logging or load balancing which means that when you have multiple virtual servers because
+
+39
+00:02:55,360 --> 00:03:00,340
+your app is doing really doing well and you need more resources, that in such a case incoming requests
+
+40
+00:03:00,430 --> 00:03:05,800
+are sent to servers with available capacities in an efficient way.
+
+41
+00:03:06,040 --> 00:03:12,100
+So that is all handled by so-called managed servers which are typically invisible to you which you don't
+
+42
+00:03:12,100 --> 00:03:18,130
+configure but which are part of the hosting provider package you could say and you just use a nice user
+
+43
+00:03:18,130 --> 00:03:23,590
+interface provided by the hosting provider to set up how your app behaves
+
+44
+00:03:23,590 --> 00:03:27,140
+regarding ssl or regarding logging and so on.
+
+45
+00:03:27,220 --> 00:03:34,030
+Now this all runs in a private network which means that your own virtual server and your code is not directly
+
+46
+00:03:34,030 --> 00:03:40,310
+exposed to the web but it's exposed to that managed server which then in turn talks to the web and therefore
+
+47
+00:03:40,300 --> 00:03:44,050
+to your users through a public server gateway
+
+48
+00:03:44,320 --> 00:03:50,770
+and that essentially is like a door where requests can come in there and then forwarded to your server,
+
+49
+00:03:50,770 --> 00:03:52,140
+to your virtual server
+
+50
+00:03:52,150 --> 00:03:53,970
+and the responses are also forwarded.
+
+51
+00:03:54,960 --> 00:03:57,790
+So this is how this works,
+
+52
+00:03:57,840 --> 00:03:59,820
+this is how most hosting providers work,
+
+53
+00:03:59,820 --> 00:04:01,700
+that is what happens behind the scenes,
+
+54
+00:04:01,770 --> 00:04:03,480
+just important for you to know,
+
+55
+00:04:03,600 --> 00:04:06,200
+not really a lot of stuff you have to do on that.
+
+56
+00:04:06,330 --> 00:04:08,480
+Now that is the behind the scenes stuff,
+
+57
+00:04:08,640 --> 00:04:12,600
+now let me show you how heroku works and how we can deploy with it
+
+58
+00:04:12,600 --> 00:04:14,510
+and of course that's just one example,
+
+59
+00:04:14,550 --> 00:04:19,270
+you can use any hosting provider you want for your application.
+
+60
+00:04:19,290 --> 00:04:22,770
+The general way of deploying your code does not really change.

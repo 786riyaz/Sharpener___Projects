@@ -1,0 +1,67 @@
+1
+00:00:02,580 --> 00:00:08,480
+Now obviously in this course we built a couple of different applications, to be precise
+
+2
+00:00:08,490 --> 00:00:14,250
+we built an application with server side rendered views and that includes the possibility to return
+
+3
+00:00:14,250 --> 00:00:21,660
+just html pages or as we did it, to use a templating engine like ejs and obviously we build two APIs,
+
+4
+00:00:21,660 --> 00:00:22,250
+.
+
+5
+00:00:22,260 --> 00:00:25,410
+we built a rest API and a grapghql API.
+
+6
+00:00:25,720 --> 00:00:30,720
+Now how do we deploy these two types of applications,
+
+7
+00:00:30,730 --> 00:00:34,390
+one with views and one without views?
+
+8
+00:00:34,500 --> 00:00:41,640
+First of all we have to keep in mind that how the application behaves, what it does with incoming requests
+
+9
+00:00:41,670 --> 00:00:46,530
+and which data it accepts and returns, this is all our logic,
+
+10
+00:00:46,560 --> 00:00:52,590
+this is all code we wrote. In the end when we look at it from a technical perspective,
+
+11
+00:00:52,770 --> 00:00:59,960
+in both kinds of applications, we start a normal node server and we use a node framework,
+
+12
+00:00:59,970 --> 00:01:08,280
+in this case the most popular one, express and therefore these types of applications have the same hosting
+
+13
+00:01:08,310 --> 00:01:09,350
+requirements.
+
+14
+00:01:09,480 --> 00:01:16,470
+We don't have to make a difference here because in the end when we move our code to a web server, then
+
+15
+00:01:16,470 --> 00:01:23,670
+there we also just want to do the exact same thing we did locally. We'll start our node server and wait
+
+16
+00:01:23,670 --> 00:01:29,670
+for incoming requests and therefore we don't have to differentiate between these kinds of applications,
+
+17
+00:01:29,760 --> 00:01:37,240
+when it comes to deployment we simply deploy our code, start the node server and we are good to go.

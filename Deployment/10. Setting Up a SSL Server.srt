@@ -1,0 +1,459 @@
+1
+00:00:02,190 --> 00:00:08,370
+Now last but not least before we then really ship our application to a server, to a hosting provider, I want
+
+2
+00:00:08,370 --> 00:00:09,920
+to have a look at ssl/tls
+
+3
+00:00:09,990 --> 00:00:14,980
+and tls is simply the newer version of that,
+
+4
+00:00:15,080 --> 00:00:21,960
+ssl is the term more people know however. Both is about securing your data that is sent from a client
+
+5
+00:00:21,990 --> 00:00:27,840
+to the server because when we communicate between client server, we typically exchange data.
+
+6
+00:00:27,870 --> 00:00:35,220
+Now we can have an attacker, third party who's eavesdropping on that data, this is technically possible,
+
+7
+00:00:35,220 --> 00:00:41,120
+of course not super trivial but possible and therefore this attacker could read your data which you're
+
+8
+00:00:41,130 --> 00:00:44,680
+sending from the client to the server which is of course a problem
+
+9
+00:00:44,730 --> 00:00:48,700
+if we're talking about credit card data or anything like that.
+
+10
+00:00:48,810 --> 00:00:54,530
+Hence we want to protect that data and we do that with ssl/tls encryption.
+
+11
+00:00:54,630 --> 00:00:59,970
+Now once such encryption is in place, eavesdropping is not possible anymore because while the data is
+
+12
+00:01:00,250 --> 00:01:08,850
+unreadable as long as it is in transit and it will be decrypted on the server. Now to enable that encryption
+
+13
+00:01:08,930 --> 00:01:13,810
+and to be able to decrypt it, we work with a public private key pair,
+
+14
+00:01:13,920 --> 00:01:16,260
+both is known to the server.
+
+15
+00:01:16,680 --> 00:01:23,160
+Now that public key is as the name suggests, not something we have to protect, the private key is
+
+16
+00:01:23,160 --> 00:01:28,410
+however, the private key will ever only be known by the server because the private key will later be
+
+17
+00:01:28,410 --> 00:01:30,630
+important for decrypting the data,
+
+18
+00:01:30,750 --> 00:01:36,230
+the public key will be used for encrypting. Now in ssl certificate,
+
+19
+00:01:36,360 --> 00:01:40,070
+we bind that public key to the server identity,
+
+20
+00:01:40,290 --> 00:01:46,920
+the identity is simply something like the domain, the admin email address, you set that data when you
+
+21
+00:01:46,920 --> 00:01:54,450
+create a certificate. That ssl certificate therefore connects a public key and a server and sends that
+
+22
+00:01:54,480 --> 00:01:59,910
+to the client, to the browser so that the client also is aware of the public key and knows that it belongs
+
+23
+00:01:59,910 --> 00:02:01,220
+to that server.
+
+24
+00:02:01,260 --> 00:02:07,260
+Now typically you will use a certificate authority for that, though you can create your own ssl
+
+25
+00:02:07,260 --> 00:02:10,400
+certificates too and we'll do that in this module
+
+26
+00:02:10,650 --> 00:02:16,800
+but when you create your own keys, then the browser does not actually trust you that the information in there
+
+27
+00:02:16,800 --> 00:02:24,120
+is correct and that is when you get informations or warnings like hey this page uses ssl but doesn't
+
+28
+00:02:24,120 --> 00:02:25,290
+seem to be secure,
+
+29
+00:02:25,290 --> 00:02:26,910
+do you really want to visit it.
+
+30
+00:02:27,180 --> 00:02:35,030
+Hence in production, you would use a ssl certificate provided by a known certificate authority which the
+
+31
+00:02:35,040 --> 00:02:40,210
+browser trusts and therefore you have a real secure and trusted protection.
+
+32
+00:02:40,470 --> 00:02:43,240
+Nonetheless the way it works always is the same,
+
+33
+00:02:43,320 --> 00:02:49,890
+we have that public key, part of that certificate, certificate ideally is not created by you but by a trusted
+
+34
+00:02:49,890 --> 00:02:54,660
+authority, we will create it here on our own though because that will be free,
+
+35
+00:02:54,660 --> 00:03:01,080
+that public key is then received by the client through that certificate and now the client can encrypt
+
+36
+00:03:01,140 --> 00:03:07,440
+the data which it sends to the server and the server can decrypt the data with that private key and
+
+37
+00:03:07,530 --> 00:03:10,910
+only that private key can decrypt that data
+
+38
+00:03:10,980 --> 00:03:15,540
+and this is how that works and how that secures your data in transit.
+
+39
+00:03:15,540 --> 00:03:18,090
+Now let me show you how this works in practice,
+
+40
+00:03:18,150 --> 00:03:23,680
+now to set up a ssl connection on your own server with your own certificate,
+
+41
+00:03:23,760 --> 00:03:29,250
+again you should get one from an authority once you deploy that to production but for testing this, we
+
+42
+00:03:29,250 --> 00:03:31,480
+can definitely play around with our own one,
+
+43
+00:03:31,500 --> 00:03:38,970
+we need to create a certificate and we do it with a command named open ssl. On Mac and Linux, you have
+
+44
+00:03:38,970 --> 00:03:40,490
+that available by default,
+
+45
+00:03:40,740 --> 00:03:41,910
+on Windows you don't
+
+46
+00:03:42,030 --> 00:03:47,140
+but there you can find it by googling for open ssl windows and then that
+
+47
+00:03:47,150 --> 00:03:48,150
+second link here,
+
+48
+00:03:48,150 --> 00:03:55,560
+this binaries link leads you to a page where you can take the first link to ssl pro web and there when
+
+49
+00:03:55,560 --> 00:04:02,520
+you scroll down, you'll find installers that install this open ssl tool on Windows too, so that you can
+
+50
+00:04:02,520 --> 00:04:03,920
+follow along with the commands
+
+51
+00:04:03,970 --> 00:04:10,530
+I'm about to run on Windows as well. Choose your version here, install it and once you have installed it, you
+
+52
+00:04:10,530 --> 00:04:24,850
+can run open ssl rec-nodes-new-x509-keyout server.key-out server.cert
+
+53
+00:04:24,900 --> 00:04:32,100
+and this will give you that private key and the public key packaged up in a certificate.
+
+54
+00:04:32,110 --> 00:04:39,730
+Now once you hit enter, you will be asked a couple of questions and there make sure to choose valid values
+
+55
+00:04:39,730 --> 00:04:45,760
+though that does not really matter too much but the idea here is that you connect your identity,
+
+56
+00:04:45,820 --> 00:04:49,300
+the identity of your application to your public key
+
+57
+00:04:49,300 --> 00:04:54,850
+though again your own self-signed certificate will not be accepted by browsers anyways,
+
+58
+00:04:55,000 --> 00:04:58,330
+for production you should not use that option. Still
+
+59
+00:04:58,630 --> 00:05:06,200
+let's fill it out with some truthy values
+
+60
+00:05:06,500 --> 00:05:09,080
+and one important value is this common name,
+
+61
+00:05:09,080 --> 00:05:15,230
+you must set this to localhost otherwise the certificate will not work because this has to be set to
+
+62
+00:05:15,230 --> 00:05:16,370
+your domain.
+
+63
+00:05:16,370 --> 00:05:22,860
+So if you were to use your self-signed certificate on the server you deploy your app to and you host
+
+64
+00:05:22,860 --> 00:05:28,040
+this app on example.com, then then you would have to set this to example.com.
+
+65
+00:05:28,220 --> 00:05:34,070
+Again typically you request a certificate for your domain by some authority and then they will do this
+
+66
+00:05:34,070 --> 00:05:34,610
+for you
+
+67
+00:05:34,700 --> 00:05:40,400
+but if you create your own one, use the domain your app is running on and locally, that is localhost
+
+68
+00:05:40,640 --> 00:05:44,340
+and this certificate will be denied and will not be accepted
+
+69
+00:05:44,450 --> 00:05:51,240
+if you set this to another value. Now after you did all that, you'll find two new files in your folder,
+
+70
+00:05:51,390 --> 00:05:57,270
+server cert which is the certificate and server key which is the private key. Now the private key will
+
+71
+00:05:57,270 --> 00:05:58,780
+always stay on your server,
+
+72
+00:05:58,830 --> 00:06:02,060
+the certificate is what we send to the client in the end.
+
+73
+00:06:02,100 --> 00:06:04,950
+Now to use that, in app.js I
+
+74
+00:06:04,980 --> 00:06:11,580
+first of all have to import a new node module and that is the https module which allows us to spin
+
+75
+00:06:11,580 --> 00:06:13,740
+up an https server.
+
+76
+00:06:13,860 --> 00:06:19,450
+Thus far, we directly or indirectly through app listen used http, 
+
+77
+00:06:19,530 --> 00:06:27,630
+now we'll use https. To use that, I need to read in my files and I will do that up here.
+
+78
+00:06:27,990 --> 00:06:36,880
+I will read in my private key by using the node file system package which you need to make sure you
+
+79
+00:06:36,880 --> 00:06:38,440
+import in this file
+
+80
+00:06:38,470 --> 00:06:45,800
+here, you need that file system package and there, you can read a file synchronously.
+
+81
+00:06:45,800 --> 00:06:50,220
+Now this will block code execution until the file is read and you learned
+
+82
+00:06:50,250 --> 00:06:52,610
+that typically, this is not what you want to do
+
+83
+00:06:52,790 --> 00:06:58,700
+but here I actually don't want to continue with starting the server unless I have read that file in.
+
+84
+00:06:59,030 --> 00:07:05,650
+So here I will read that file synchronously and the file I want to read is server.key,
+
+85
+00:07:05,690 --> 00:07:14,550
+so my private key file. I'll also add another constant which I'll name certificate and that will be fs read
+
+86
+00:07:14,550 --> 00:07:20,370
+file sync and then of course it's my server.cert file.
+
+87
+00:07:20,570 --> 00:07:25,300
+Now with these two files read in, we can scroll down to the place where we start the server with app
+
+88
+00:07:25,310 --> 00:07:32,940
+listen and now I'll not use app listen any more but I'll use https, this new package we just imported and there,
+
+89
+00:07:32,990 --> 00:07:36,340
+create server to create a https server.
+
+90
+00:07:36,650 --> 00:07:38,430
+This now needs two arguments,
+
+91
+00:07:38,480 --> 00:07:40,430
+the first one configures the server
+
+92
+00:07:40,580 --> 00:07:47,240
+and here we have to point it at our private key and the certificate and the second argument will be our
+
+93
+00:07:47,240 --> 00:07:48,340
+request handler,
+
+94
+00:07:48,410 --> 00:07:53,850
+in our case our express application. So the second argument will be our app,
+
+95
+00:07:53,900 --> 00:08:00,560
+the first argument will be a javascript object where you need to set two things, you need to set the
+
+96
+00:08:00,560 --> 00:08:04,140
+key key and you set that to that private key
+
+97
+00:08:04,140 --> 00:08:11,540
+constant we created a second ago and you also need to set the cert key which you set to that certificate
+
+98
+00:08:11,720 --> 00:08:17,090
+constant we created a second ago and then we listen on that server.
+
+99
+00:08:17,090 --> 00:08:21,390
+Now with that, if you run npm start, it will start your server
+
+100
+00:08:21,530 --> 00:08:30,410
+but now using ssl encryption and if we now go back to our application and we reload localhost 3000,
+
+101
+00:08:30,590 --> 00:08:34,030
+this will fail because by default it uses http,
+
+102
+00:08:34,100 --> 00:08:42,460
+if I use https localhost 3000, it will fail because the browser does not accept that custom or that
+
+103
+00:08:42,470 --> 00:08:45,120
+self-signed certificate as you learned
+
+104
+00:08:45,190 --> 00:08:52,180
+but if you click on advanced here, you can proceed to localhost and now again, the browser does warn us
+
+105
+00:08:52,180 --> 00:08:54,890
+because it does not like our self-signed certificate
+
+106
+00:08:55,060 --> 00:09:01,070
+but technically we are now using ssl protection. And this is how you enable it
+
+107
+00:09:01,180 --> 00:09:06,550
+but just as with logging and compression, typically you would set this up differently,
+
+108
+00:09:06,550 --> 00:09:11,770
+you would let your hosting provider set this up because technically the hosting provider often also
+
+109
+00:09:11,770 --> 00:09:18,700
+has its own servers in front of yours and the servers of the hosting provider then use ssl and the traffic
+
+110
+00:09:18,700 --> 00:09:25,330
+between your app and the in-between servers does use http because it's blocked or it's not available
+
+111
+00:09:25,330 --> 00:09:31,570
+to the public anyways and the hosting providers front servers would implement this logic. So you wouldn't
+
+112
+00:09:31,570 --> 00:09:33,180
+write that code on your own
+
+113
+00:09:33,280 --> 00:09:41,060
+and indeed here, I will fallback to my old code where I just had app listen because we'll need that
+
+114
+00:09:41,060 --> 00:09:45,800
+later when we deploy it because we will let our hosting provider manage ssl
+
+115
+00:09:45,800 --> 00:09:52,490
+but if you ever need to do it manually, this is how you do start a node server in https mode.

@@ -1,0 +1,63 @@
+1
+00:00:02,250 --> 00:00:08,790
+Now I did mention on the slide that you also want to exchange testing keys for production keys and in our case,
+
+2
+00:00:08,850 --> 00:00:13,780
+that would be that stripe key we're using here through environment variables which we do set in the
+
+3
+00:00:13,790 --> 00:00:16,650
+nodemon and in the package.json file.
+
+4
+00:00:16,650 --> 00:00:24,000
+Now obviously that always depends on which kind of APIs or third party services you are using. Maybe
+
+5
+00:00:24,000 --> 00:00:27,840
+in your app, you use no service at all and therefore this is not an issue for you,
+
+6
+00:00:28,050 --> 00:00:33,900
+with stripe what you want to do is you want to click on that to switch to public or to production ready
+
+7
+00:00:34,310 --> 00:00:35,420
+data.
+
+8
+00:00:35,480 --> 00:00:41,040
+Now you need to activate your account here to be able to do that as you see and to activate your account,
+
+9
+00:00:41,190 --> 00:00:45,970
+you have to fill out some information including some payment information.
+
+10
+00:00:46,410 --> 00:00:48,530
+And therefore I will not do that here
+
+11
+00:00:48,570 --> 00:00:54,570
+but if you were to deploy this into production, you need to fill that all out and once you fill that out,
+
+12
+00:00:54,780 --> 00:01:01,740
+you will be able to switch that toggle here here at the top and see your live data, your production ready
+
+13
+00:01:01,740 --> 00:01:05,110
+keys and you should use these keys in your code.
+
+14
+00:01:05,190 --> 00:01:10,230
+So wherever you are using the test keys right now, you would have to replace them with the production
+
+15
+00:01:10,230 --> 00:01:13,970
+ready keys and that is just a stripe example, other APIs
+
+16
+00:01:13,980 --> 00:01:16,630
+you might be using might have a similar behavior.

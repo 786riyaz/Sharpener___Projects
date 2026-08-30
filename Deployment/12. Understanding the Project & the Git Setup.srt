@@ -1,0 +1,211 @@
+1
+00:00:02,380 --> 00:00:07,650
+So I'm back on heroku and I created an account which is why I'm in my dashboard now.
+
+2
+00:00:07,720 --> 00:00:09,970
+If you haven't done that, definitely do so,
+
+3
+00:00:09,970 --> 00:00:15,670
+click on sign up, create a new account, enter your data and you should end up on a similar dashboard and
+
+4
+00:00:15,670 --> 00:00:18,290
+have a create new app button somewhere.
+
+5
+00:00:18,340 --> 00:00:22,770
+Now when you click that, on heroku you can give your app a name and I'll name it
+
+6
+00:00:22,800 --> 00:00:27,250
+node complete udemy, the name is up to you of course.
+
+7
+00:00:27,250 --> 00:00:28,460
+You can choose a region,
+
+8
+00:00:28,470 --> 00:00:34,840
+I'll go with Europe because I'm located there but that is up to you of course and you can then simply
+
+9
+00:00:34,840 --> 00:00:37,360
+click on create app.
+
+10
+00:00:37,510 --> 00:00:42,830
+Now with that clicked, you can now choose a couple of different things.
+
+11
+00:00:42,850 --> 00:00:45,760
+First of all, we can ignore the pipeline feature, here
+
+12
+00:00:45,770 --> 00:00:48,610
+deployment method will use heroku git,
+
+13
+00:00:48,640 --> 00:00:56,810
+now what is git? Git is a tool which is not part of heroku but used by heroku. Git is a version control
+
+14
+00:00:56,810 --> 00:01:00,430
+system and as such, it's a tool which you can use,
+
+15
+00:01:00,460 --> 00:01:05,830
+it's totally optional but it helps a lot with saving and managing your source code.
+
+16
+00:01:05,830 --> 00:01:12,050
+It allows you to work with so-called commits, branches and remote repositories to name some of its most
+
+17
+00:01:12,050 --> 00:01:16,400
+important features. Commits are basically snapshots of your code which you can take
+
+18
+00:01:16,550 --> 00:01:21,260
+but when you can always switch, so you can always go back to the older version of your code and have
+
+19
+00:01:21,260 --> 00:01:26,530
+a look at it and then go back to your most recent one or rollback to an older commit,
+
+20
+00:01:26,540 --> 00:01:33,260
+so this allows you to revert to older snapshots easily or well safely add it to your code because you can
+
+21
+00:01:33,260 --> 00:01:34,580
+always go back,
+
+22
+00:01:34,610 --> 00:01:40,740
+now you can create commits after you fix some bugs, after you add new features and so on.
+
+23
+00:01:40,940 --> 00:01:46,960
+Branches also allow you to not just have one history of snapshots but multiple histories for different
+
+24
+00:01:46,970 --> 00:01:48,040
+versions of your code,
+
+25
+00:01:48,290 --> 00:01:54,710
+so you could have a master branch where your production ready code is in and then you want to fix bugs
+
+26
+00:01:54,710 --> 00:01:56,930
+or add new features in other branches
+
+27
+00:01:56,960 --> 00:01:59,440
+so that your main code is untouched
+
+28
+00:01:59,660 --> 00:02:05,210
+but when a new feature done, you can do something which is called merging and merge the new feature branch
+
+29
+00:02:05,330 --> 00:02:10,660
+with your main branch so that you have one branch which you can put back into production again
+
+30
+00:02:10,730 --> 00:02:16,610
+but it allows you to work on different features in different branches without affecting your main finished
+
+31
+00:02:16,610 --> 00:02:17,870
+code for now
+
+32
+00:02:17,870 --> 00:02:23,630
+and this allows you to basically separate your development workflow from let's say, the new feature or
+
+33
+00:02:23,630 --> 00:02:27,980
+bug fixing to production workflow. Remote repositories,
+
+34
+00:02:27,970 --> 00:02:33,350
+that simply means that your code is not only stored locally as it is by default but that you can store
+
+35
+00:02:33,350 --> 00:02:39,980
+it and its commit and branches in the cloud and that of course means that you can protect against loss
+
+36
+00:02:39,980 --> 00:02:45,430
+of local data and you can also access your source code from different machines and share it with other
+
+37
+00:02:45,440 --> 00:02:51,770
+developers of course and you can also use that feature to deploy your code automatically
+
+38
+00:02:51,770 --> 00:02:57,330
+and that is what heroku does because you will essentially use heroku as a remote repository
+
+39
+00:02:57,500 --> 00:03:04,560
+which means when you push your code to that remote repository, to heroku, it will then be taken by heroku
+
+40
+00:03:04,820 --> 00:03:11,290
+and it will be put into production and a server will be spun up based on it automatically.
+
+41
+00:03:11,320 --> 00:03:15,270
+That is what git is and that is what heroku uses here.
+
+42
+00:03:15,320 --> 00:03:20,990
+Now that means that you will need git and for that you can simply google for git and then it's this link
+
+43
+00:03:20,990 --> 00:03:21,480
+here,
+
+44
+00:03:21,620 --> 00:03:24,150
+gitscm.com
+
+45
+00:03:24,370 --> 00:03:29,880
+and there you can simply click downloads and download it for your operating system.
+
+46
+00:03:29,950 --> 00:03:36,070
+Simply download the installer for your operating system here and walk through the steps presented there
+
+47
+00:03:36,280 --> 00:03:38,490
+and thereafter, you'll have git installed.
+
+48
+00:03:38,550 --> 00:03:43,530
+Now check the documentation in case you are facing any problems and also attached to this video,
+
+49
+00:03:43,540 --> 00:03:46,540
+you'll find some free links to get you started with git
+
+50
+00:03:46,570 --> 00:03:49,510
+in case you want to learn more about it. For the deployment
+
+51
+00:03:49,510 --> 00:03:52,060
+only, you don't really need to become a git expert though,
+
+52
+00:03:52,090 --> 00:03:56,930
+you only need it installed. Once you did that,
+
+53
+00:03:57,250 --> 00:04:00,490
+let's continue with the rest of the deployment process here.
