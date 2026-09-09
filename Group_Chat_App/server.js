@@ -293,7 +293,7 @@ app.get(
                     .sort({ createdAt: 1 })
                     .limit(100)
                     .select(
-                        "sender receiver message type createdAt"
+                        "sender receiver roomId message type createdAt"
                     );
 
             return res.json({

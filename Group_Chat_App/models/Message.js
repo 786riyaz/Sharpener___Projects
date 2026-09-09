@@ -12,6 +12,11 @@ const messageSchema = new mongoose.Schema(
             ref: "User",
             default: null
         },
+        roomId: {
+            type: String,
+            default: null,
+            index: true
+        },
         message: {
             type: String,
             required: true,

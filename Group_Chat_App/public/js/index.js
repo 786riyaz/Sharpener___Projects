@@ -37,9 +37,38 @@ const sendButton =
     document.getElementById("sendButton");
 
 let selectedUser = null;
+let currentRoomId = null;
 
 currentUserElement.textContent =
     currentUser.name;
+
+
+/*
+Exercise 12:
+Both users must generate exactly the same room ID.
+
+Example:
+    Jack -> Asif
+    Asif -> Jack
+
+Both become:
+    personal:asif@email.com|jack@email.com
+*/
+function createPersonalRoomId(
+    emailA,
+    emailB
+) {
+    return `personal:${[
+        String(emailA)
+            .trim()
+            .toLowerCase(),
+        String(emailB)
+            .trim()
+            .toLowerCase()
+    ]
+        .sort()
+        .join("|")}`;
+}
 
 
 const socket = io({
@@ -55,17 +84,15 @@ socket.on("connect", () => {
         socket.id
     );
 
-    // Exercise 11 client-side room join.
-    socket.emit(
-        "join-room",
-        currentUser.email,
-        (response) => {
-            console.log(
-                "Join room response:",
-                response
-            );
-        }
-    );
+    /*
+    A socket reconnect creates a fresh server-side connection.
+    If a conversation is already selected, join that room again.
+    */
+    if (currentRoomId) {
+        joinCurrentRoom(
+            currentRoomId
+        );
+    }
 });
 
 
@@ -105,25 +132,25 @@ socket.on(
 );
 
 
-// Receive personal messages.
+/*
+Exercise 12:
+Receive only messages emitted to the personal room that
+the client has currently selected.
+*/
 socket.on(
     "chat-message",
     (chatMessage) => {
-        if (!selectedUser) {
+        if (
+            !currentRoomId ||
+            chatMessage.roomId !==
+                currentRoomId
+        ) {
             return;
         }
 
-        const isCurrentConversation =
-            chatMessage.senderEmail ===
-                selectedUser.email ||
-            chatMessage.receiverEmail ===
-                selectedUser.email;
-
-        if (isCurrentConversation) {
-            renderMessage(
-                chatMessage
-            );
-        }
+        renderMessage(
+            chatMessage
+        );
     }
 );
 
@@ -213,8 +240,30 @@ searchInput.addEventListener(
 );
 
 
+/*
+When the selected user changes:
+
+1. Leave the old room.
+2. Create a deterministic room ID.
+3. Join the new room.
+4. Load the stored MongoDB conversation.
+*/
 async function selectUser(user) {
+    const nextRoomId =
+        createPersonalRoomId(
+            currentUser.email,
+            user.email
+        );
+
+    if (
+        currentRoomId &&
+        currentRoomId !== nextRoomId
+    ) {
+        await leaveCurrentRoom();
+    }
+
     selectedUser = user;
+    currentRoomId = nextRoomId;
 
     chatTitle.textContent =
         `Chat with ${user.name} (${user.email})`;
@@ -224,9 +273,90 @@ async function selectUser(user) {
 
     messagesContainer.innerHTML = "";
 
+    const joined =
+        await joinCurrentRoom(
+            currentRoomId
+        );
+
+    if (!joined) {
+        selectedUser = null;
+        currentRoomId = null;
+
+        messageInput.disabled = true;
+        sendButton.disabled = true;
+
+        chatTitle.textContent =
+            "Unable to join personal chat";
+
+        return;
+    }
+
     await loadConversation(
         user
     );
+}
+
+
+function joinCurrentRoom(roomId) {
+    return new Promise((resolve) => {
+        socket.emit(
+            "join-room",
+            roomId,
+            (response) => {
+                if (!response?.success) {
+                    alert(
+                        response?.message ||
+                            "Unable to join room"
+                    );
+
+                    resolve(false);
+                    return;
+                }
+
+                console.log(
+                    "Joined room:",
+                    response.roomId
+                );
+
+                resolve(true);
+            }
+        );
+    });
+}
+
+
+function leaveCurrentRoom() {
+    return new Promise((resolve) => {
+        if (!currentRoomId) {
+            resolve(true);
+            return;
+        }
+
+        socket.emit(
+            "leave-room",
+            currentRoomId,
+            (response) => {
+                if (
+                    !response?.success
+                ) {
+                    console.warn(
+                        "Unable to leave room:",
+                        response?.message
+                    );
+
+                    resolve(false);
+                    return;
+                }
+
+                console.log(
+                    "Left room:",
+                    response.roomId
+                );
+
+                resolve(true);
+            }
+        );
+    });
 }
 
 
@@ -257,7 +387,10 @@ async function loadConversation(user) {
                     sender:
                         String(
                             message.sender
-                        )
+                        ),
+                    roomId:
+                        message.roomId ||
+                        currentRoomId
                 });
             }
         );
@@ -275,7 +408,10 @@ messageForm.addEventListener(
     (event) => {
         event.preventDefault();
 
-        if (!selectedUser) {
+        if (
+            !selectedUser ||
+            !currentRoomId
+        ) {
             return;
         }
 
@@ -286,19 +422,23 @@ messageForm.addEventListener(
             return;
         }
 
-        // Exercise 11:
-        // Client sends message + target room.
+        /*
+        Exercise 12:
+        Send the message to the specific room ID instead of
+        broadcasting it to every connected user.
+        */
         socket.emit(
             "new-message",
             {
                 message,
-                roomName:
-                    selectedUser.email
+                roomId:
+                    currentRoomId
             },
             (response) => {
-                if (!response.success) {
+                if (!response?.success) {
                     alert(
-                        response.message
+                        response?.message ||
+                            "Unable to send message"
                     );
                 }
             }
@@ -312,8 +452,8 @@ messageForm.addEventListener(
 function renderMessage(message) {
     const senderId =
         String(
-            message.sender ||
             message.sender?._id ||
+            message.sender ||
             ""
         );
 
@@ -343,7 +483,11 @@ document
     .getElementById("logoutButton")
     .addEventListener(
         "click",
-        () => {
+        async () => {
+            if (currentRoomId) {
+                await leaveCurrentRoom();
+            }
+
             socket.disconnect();
 
             localStorage.clear();
