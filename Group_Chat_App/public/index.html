@@ -1,22 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Group Chat App</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Socket.IO Personal Chat</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <main class="auth-container">
-        <section class="auth-card">
-            <h1>Group Chat</h1>
-            <p>Login or create an account to start chatting.</p>
+    <header>
+        <h1>Socket.IO Chat</h1>
 
-            <div class="auth-actions">
-                <a href="/login.html">Login</a>
-                <a href="/signup.html" class="secondary">Create account</a>
+        <div class="header-user">
+            <span id="currentUser"></span>
+            <button id="logoutButton">
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <main class="app">
+        <aside class="sidebar">
+            <h2>Users</h2>
+
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="Search by email"
+            >
+
+            <div
+                id="usersList"
+                class="users-list"
+            ></div>
+        </aside>
+
+        <section class="chat-section">
+            <div class="chat-top">
+                <h2 id="chatTitle">
+                    Select a user to start personal chat
+                </h2>
             </div>
+
+            <div
+                id="messages"
+                class="messages"
+            ></div>
+
+            <form
+                id="messageForm"
+                class="message-form"
+            >
+                <input
+                    id="messageInput"
+                    type="text"
+                    placeholder="Type a message here"
+                    autocomplete="off"
+                    disabled
+                >
+
+                <button
+                    type="submit"
+                    id="sendButton"
+                    disabled
+                >
+                    Send
+                </button>
+            </form>
         </section>
     </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/index.js"></script>
 </body>
 </html>

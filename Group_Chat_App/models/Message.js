@@ -2,15 +2,25 @@ const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema(
     {
-        userId: {
+        sender: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true
+        },
+        receiver: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
         },
         message: {
             type: String,
             required: true,
             trim: true
+        },
+        type: {
+            type: String,
+            enum: ["group", "personal"],
+            default: "group"
         }
     },
     {

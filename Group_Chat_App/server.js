@@ -2,27 +2,34 @@ require("dotenv").config();
 
 const express = require("express");
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 const http = require("http");
 
 const User = require("./models/User");
 const Message = require("./models/Message");
-const setupSocketIO = require("./socket-io");
+const authenticateToken =
+    require("./middleware/auth");
+const setupSocketIO =
+    require("./socket_io");
 
 const app = express();
 const httpServer = http.createServer(app);
 
 // IMPORTANT:
-// `io` is declared only once in this file.
-// The actual Socket.IO implementation lives in ./socket-io/index.js.
+// Socket.IO is created only inside socket_io/index.js.
+// This avoids the "Identifier 'io' has already been declared" error.
 const io = setupSocketIO(httpServer);
 
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(
+    express.static(
+        path.join(__dirname, "public")
+    )
+);
 
 mongoose
     .connect(process.env.MONGODB_URI)
@@ -30,116 +37,151 @@ mongoose
         console.log("MongoDB connected successfully");
     })
     .catch((error) => {
-        console.error("MongoDB connection error:", error);
+        console.log(
+            "MongoDB connection error:",
+            error.message
+        );
     });
 
-function createToken(userId) {
-    return jwt.sign(
-        { userId },
-        process.env.JWT_SECRET,
-        { expiresIn: "7d" }
-    );
-}
 
-// ---------------------------
-// Authentication APIs
-// ---------------------------
-
+// SIGN UP
 app.post("/api/signup", async (req, res) => {
     try {
-        const { name, email, phone, password } = req.body;
+        const {
+            name,
+            email,
+            phone,
+            password
+        } = req.body;
 
-        if (!name || !email || !phone || !password) {
+        if (
+            !name ||
+            !email ||
+            !phone ||
+            !password
+        ) {
             return res.status(400).json({
-                message: "Name, email, phone and password are required"
+                success: false,
+                message: "All fields are required"
             });
         }
 
-        const normalizedEmail = email.toLowerCase().trim();
-        const normalizedPhone = phone.trim();
+        const normalizedEmail =
+            email.trim().toLowerCase();
 
-        const existingUser = await User.findOne({
-            $or: [
-                { email: normalizedEmail },
-                { phone: normalizedPhone }
-            ]
-        });
+        const existingUser =
+            await User.findOne({
+                $or: [
+                    { email: normalizedEmail },
+                    { phone: phone.trim() }
+                ]
+            });
 
         if (existingUser) {
-            return res.status(409).json({
-                message: "Email or phone number already exists"
+            return res.status(400).json({
+                success: false,
+                message:
+                    "User already exists with this email or phone number"
             });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword =
+            await bcrypt.hash(password, 10);
 
-        const user = await User.create({
-            name: name.trim(),
-            email: normalizedEmail,
-            phone: normalizedPhone,
-            password: hashedPassword
-        });
-
-        const token = createToken(user._id.toString());
+        const newUser =
+            await User.create({
+                name: name.trim(),
+                email: normalizedEmail,
+                phone: phone.trim(),
+                password: hashedPassword
+            });
 
         return res.status(201).json({
-            message: "Signup successful",
-            token,
+            success: true,
+            message: "User registered successfully",
             user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone
+                id: newUser._id,
+                name: newUser.name,
+                email: newUser.email,
+                phone: newUser.phone
             }
         });
     } catch (error) {
-        console.error("Signup error:", error);
+        console.log("Signup error:", error);
 
         return res.status(500).json({
-            message: "Unable to register user"
+            success: false,
+            message: "Internal server error"
         });
     }
 });
 
+
+// LOGIN
 app.post("/api/login", async (req, res) => {
     try {
-        const { identifier, password } = req.body;
+        const {
+            login,
+            password
+        } = req.body;
 
-        if (!identifier || !password) {
+        if (!login || !password) {
             return res.status(400).json({
-                message: "Email/phone and password are required"
+                success: false,
+                message:
+                    "Login and password are required"
             });
         }
 
-        const value = identifier.trim();
+        const loginValue = login.trim();
 
         const user = await User.findOne({
             $or: [
-                { email: value.toLowerCase() },
-                { phone: value }
+                {
+                    email:
+                        loginValue.toLowerCase()
+                },
+                {
+                    phone: loginValue
+                }
             ]
         });
 
         if (!user) {
             return res.status(401).json({
-                message: "Invalid credentials"
+                success: false,
+                message:
+                    "Invalid email/phone or password"
             });
         }
 
-        const passwordMatches = await bcrypt.compare(
-            password,
-            user.password
+        const isPasswordCorrect =
+            await bcrypt.compare(
+                password,
+                user.password
+            );
+
+        if (!isPasswordCorrect) {
+            return res.status(401).json({
+                success: false,
+                message:
+                    "Invalid email/phone or password"
+            });
+        }
+
+        const token = jwt.sign(
+            {
+                userId: user._id,
+                email: user.email
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d"
+            }
         );
 
-        if (!passwordMatches) {
-            return res.status(401).json({
-                message: "Invalid credentials"
-            });
-        }
-
-        const token = createToken(user._id.toString());
-
-        return res.json({
+        return res.status(200).json({
+            success: true,
             message: "Login successful",
             token,
             user: {
@@ -150,109 +192,226 @@ app.post("/api/login", async (req, res) => {
             }
         });
     } catch (error) {
-        console.error("Login error:", error);
+        console.log("Login error:", error);
 
         return res.status(500).json({
-            message: "Unable to login"
+            success: false,
+            message: "Internal server error"
         });
     }
 });
 
-// ---------------------------
-// JWT middleware for HTTP APIs
-// ---------------------------
 
-function authenticateRequest(req, res, next) {
-    try {
-        const authorization = req.headers.authorization || "";
-        const token = authorization.startsWith("Bearer ")
-            ? authorization.slice(7)
-            : null;
+// SEARCH USERS FOR PERSONAL CHAT
+app.get(
+    "/api/users",
+    authenticateToken,
+    async (req, res) => {
+        try {
+            const search =
+                String(
+                    req.query.email || ""
+                )
+                    .trim()
+                    .toLowerCase();
 
-        if (!token) {
-            return res.status(401).json({
-                message: "Authentication token is required"
+            const users = await User.find({
+                _id: {
+                    $ne: req.userId
+                },
+                ...(search
+                    ? {
+                        email: {
+                            $regex: search,
+                            $options: "i"
+                        }
+                    }
+                    : {})
+            })
+                .select("_id name email")
+                .sort({ name: 1 })
+                .limit(20);
+
+            return res.json({
+                success: true,
+                users
+            });
+        } catch (error) {
+            console.log(
+                "User search error:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Unable to search users"
             });
         }
-
-        const decoded = jwt.verify(
-            token,
-            process.env.JWT_SECRET
-        );
-
-        req.userId = decoded.userId;
-
-        next();
-    } catch (error) {
-        return res.status(401).json({
-            message: "Invalid or expired token"
-        });
     }
-}
+);
 
-// ---------------------------
-// Message APIs
-// ---------------------------
 
-// Kept for earlier exercises.
-// The frontend in this version sends new messages through Socket.IO.
-app.post("/api/messages", authenticateRequest, async (req, res) => {
-    try {
-        const { message } = req.body;
+// GET PERSONAL MESSAGES
+app.get(
+    "/api/personal-messages/:email",
+    authenticateToken,
+    async (req, res) => {
+        try {
+            const otherUser =
+                await User.findOne({
+                    email:
+                        req.params.email
+                            .trim()
+                            .toLowerCase()
+                }).select("_id");
 
-        if (!message || !message.trim()) {
-            return res.status(400).json({
-                message: "Message is required"
+            if (!otherUser) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "User not found"
+                });
+            }
+
+            const messages =
+                await Message.find({
+                    type: "personal",
+                    $or: [
+                        {
+                            sender: req.userId,
+                            receiver:
+                                otherUser._id
+                        },
+                        {
+                            sender:
+                                otherUser._id,
+                            receiver: req.userId
+                        }
+                    ]
+                })
+                    .sort({ createdAt: 1 })
+                    .limit(100)
+                    .select(
+                        "sender receiver message type createdAt"
+                    );
+
+            return res.json({
+                success: true,
+                messages
+            });
+        } catch (error) {
+            console.log(
+                "Get personal messages error:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Unable to get messages"
             });
         }
-
-        const newMessage = await Message.create({
-            userId: req.userId,
-            message: message.trim()
-        });
-
-        const payload = {
-            _id: newMessage._id,
-            userId: newMessage.userId,
-            message: newMessage.message,
-            createdAt: newMessage.createdAt
-        };
-
-        // If this HTTP endpoint is used, still make it live.
-        io.emit("receiveMessage", payload);
-
-        return res.status(201).json(payload);
-    } catch (error) {
-        console.error("Create message error:", error);
-
-        return res.status(500).json({
-            message: "Unable to save message"
-        });
     }
-});
+);
 
-app.get("/api/messages", authenticateRequest, async (req, res) => {
-    try {
-        const messages = await Message.find()
-            .sort({ createdAt: 1 })
-            .lean();
 
-        return res.json(messages);
-    } catch (error) {
-        console.error("Get messages error:", error);
+// BACKWARD-COMPATIBLE REST GROUP MESSAGE API
+app.post(
+    "/api/messages",
+    authenticateToken,
+    async (req, res) => {
+        try {
+            const { message } = req.body;
 
-        return res.status(500).json({
-            message: "Unable to fetch messages"
-        });
+            if (
+                !message ||
+                !message.trim()
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Message cannot be empty"
+                });
+            }
+
+            const newMessage =
+                await Message.create({
+                    sender: req.userId,
+                    message:
+                        message.trim(),
+                    type: "group"
+                });
+
+            io.emit(
+                "newMessage",
+                newMessage
+            );
+
+            return res.status(201).json({
+                success: true,
+                message:
+                    "Message stored and broadcast successfully",
+                chatMessage: newMessage
+            });
+        } catch (error) {
+            console.log(
+                "Create message error:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Internal server error"
+            });
+        }
     }
-});
+);
 
-app.get("/api/health", (req, res) => {
-    res.json({
-        message: "Server is running"
-    });
-});
 
+// GET GROUP MESSAGES
+app.get(
+    "/api/messages",
+    authenticateToken,
+    async (req, res) => {
+        try {
+            const messages =
+                await Message.find({
+                    type: "group"
+                })
+                    .select(
+                        "sender message createdAt"
+                    )
+                    .sort({
+                        createdAt: 1
+                    });
+
+            return res.status(200).json({
+                success: true,
+                messages
+            });
+        } catch (error) {
+            console.log(
+                "Get messages error:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Internal server error"
+            });
+        }
+    }
+);
+
+
+// Start HTTP server.
+// Do NOT use app.listen() because Socket.IO is attached
+// to httpServer.
 httpServer.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(
+        `Socket.IO server running on http://localhost:${PORT}`
+    );
 });

@@ -1,26 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - Group Chat</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
-    <main class="auth-container">
-        <form id="loginForm" class="auth-card">
-            <h1>Welcome back</h1>
+<body class="auth-page">
+    <div class="auth-card">
+        <h1>Socket.IO Chat</h1>
+        <h2>Welcome Back</h2>
 
-            <input id="identifier" type="text" placeholder="Email or phone number" required />
-            <input id="password" type="password" placeholder="Password" required />
+        <form id="loginForm">
+            <label for="login">
+                Email or Phone Number
+            </label>
 
-            <button type="submit">Login</button>
+            <input
+                id="login"
+                type="text"
+                required
+            >
 
-            <p id="message"></p>
-            <p>New user? <a href="/signup.html">Create account</a></p>
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                id="password"
+                type="password"
+                required
+            >
+
+            <button type="submit">
+                Login
+            </button>
         </form>
-    </main>
 
-    <script src="/auth.js"></script>
+        <p id="errorMessage"></p>
+
+        <p>
+            Don't have an account?
+            <a href="/signup.html">
+                Sign Up
+            </a>
+        </p>
+    </div>
+
+    <script src="/js/login.js"></script>
 </body>
 </html>

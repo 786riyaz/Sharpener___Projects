@@ -1,15 +1,14 @@
 {
   "name": "group_chat_app",
   "version": "1.0.0",
-  "private": true,
-  "description": "Group Chat App - Exercise 10 Socket.IO modular folder structure",
+  "description": "Group Chat App - Socket.IO Exercises 9, 10 and 11",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js"
   },
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",

@@ -1,79 +1,43 @@
-# Group Chat App - Exercise 10
+# Group Chat App - Exercises 9, 10 and 11
 
-This project contains a complete modular Socket.IO refactor.
+## Features
 
-## Socket.IO folder structure
+- User signup and login
+- JWT authentication
+- Socket.IO authentication middleware (Exercise 9)
+- Modular `socket_io` folder structure (Exercise 10)
+- Personal rooms and personal messages (Exercise 11)
+- Search users by email
+- Real-time personal messaging
 
-```text
-socket-io/
-├── index.js
-├── middleware.js
-└── handlers/
-    └── chat.js
-```
-
-### Responsibilities
-
-- `socket-io/index.js`
-  - Creates the Socket.IO server
-  - Registers middleware
-  - Handles client connection/disconnection
-  - Registers event handlers
-
-- `socket-io/middleware.js`
-  - Verifies JWT from `socket.handshake.auth.token`
-  - Stores the authenticated user ID on `socket.userId`
-
-- `socket-io/handlers/chat.js`
-  - Handles `sendMessage`
-  - Saves the message in MongoDB
-  - Broadcasts the saved message using `io.emit("receiveMessage")`
-
-## Important refactor
-
-`server.js` does **not** create Socket.IO directly with:
-
-```js
-const io = new Server(httpServer);
-```
-
-Instead it imports the modular setup function:
-
-```js
-const setupSocketIO = require("./socket-io");
-const io = setupSocketIO(httpServer);
-```
-
-Therefore `io` is declared only once in `server.js`, avoiding:
-
-```text
-SyntaxError: Identifier 'io' has already been declared
-```
-
-## Setup
-
-1. Install dependencies:
+## Run
 
 ```bash
-npm install
-```
-
-2. Create `.env` using `.env.example`.
-
-3. Ensure MongoDB is running.
-
-4. Start:
-
-```bash
+npm i
 npm run dev
 ```
 
-5. Open:
+Then open:
 
 ```text
 http://localhost:3000
 ```
 
-## Testing real-time chat
+## Important
 
-Open two different browser sessions, create/login with users, and send a message from one session. The message should appear live in both sessions.
+MongoDB must be running locally because `.env` uses:
+
+```text
+mongodb://127.0.0.1:27017/whatsapp_clone
+```
+
+## Folder structure
+
+```text
+socket_io/
+├── handlers/
+│   ├── chat.js
+│   └── personal_chat.js
+├── index.js
+└── middleware.js
+```

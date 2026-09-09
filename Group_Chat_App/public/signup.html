@@ -1,28 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign Up - Group Chat</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
-    <main class="auth-container">
-        <form id="signupForm" class="auth-card">
-            <h1>Create account</h1>
+<body class="auth-page">
+    <div class="auth-card">
+        <h1>Socket.IO Chat</h1>
+        <h2>Create Account</h2>
 
-            <input id="name" type="text" placeholder="Name" required />
-            <input id="email" type="email" placeholder="Email" required />
-            <input id="phone" type="tel" placeholder="Phone number" required />
-            <input id="password" type="password" placeholder="Password" required />
+        <form id="signupForm">
+            <label for="name">
+                Name
+            </label>
 
-            <button type="submit">Sign Up</button>
+            <input
+                id="name"
+                type="text"
+                required
+            >
 
-            <p id="message"></p>
-            <p>Already have an account? <a href="/login.html">Login</a></p>
+            <label for="email">
+                Email
+            </label>
+
+            <input
+                id="email"
+                type="email"
+                required
+            >
+
+            <label for="phone">
+                Phone Number
+            </label>
+
+            <input
+                id="phone"
+                type="tel"
+                required
+            >
+
+            <label for="password">
+                Password
+            </label>
+
+            <input
+                id="password"
+                type="password"
+                required
+            >
+
+            <button type="submit">
+                Sign Up
+            </button>
         </form>
-    </main>
 
-    <script src="/auth.js"></script>
+        <p id="errorMessage"></p>
+
+        <p>
+            Already have an account?
+            <a href="/login.html">
+                Login
+            </a>
+        </p>
+    </div>
+
+    <script src="/js/signup.js"></script>
 </body>
 </html>
