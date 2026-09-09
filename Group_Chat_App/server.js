@@ -5,11 +5,17 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const path = require("path");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const User = require("./models/User");
 const Message = require("./models/Message");
 
 const app = express();
+const server = http.createServer(app);
+
+const io = new Server(server);
+
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
@@ -25,7 +31,7 @@ mongoose
     });
 
 // ==========================================
-// AUTH MIDDLEWARE
+// AUTH MIDDLEWARE FOR REST APIs
 // ==========================================
 function authenticateToken(req, res, next) {
     try {
@@ -56,6 +62,41 @@ function authenticateToken(req, res, next) {
         });
     }
 }
+
+// ==========================================
+// SOCKET.IO AUTHENTICATION
+// ==========================================
+io.use((socket, next) => {
+    try {
+        const token = socket.handshake.auth.token;
+
+        if (!token) {
+            return next(new Error("Authentication token is required"));
+        }
+
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
+
+        socket.userId = decoded.userId;
+
+        next();
+
+    } catch (error) {
+        next(new Error("Invalid or expired token"));
+    }
+});
+
+io.on("connection", (socket) => {
+    console.log(
+        `Socket connected: ${socket.id} | User: ${socket.userId}`
+    );
+
+    socket.on("disconnect", () => {
+        console.log(`Socket disconnected: ${socket.id}`);
+    });
+});
 
 // ==========================================
 // SIGN UP API
@@ -209,9 +250,13 @@ app.post("/api/messages", authenticateToken, async (req, res) => {
             message: message.trim()
         });
 
+        // Broadcast the saved message to every connected user.
+        // All clients receive this event live without refreshing.
+        io.emit("newMessage", newMessage);
+
         return res.status(201).json({
             success: true,
-            message: "Message stored successfully",
+            message: "Message stored and broadcast successfully",
             chatMessage: newMessage
         });
 
@@ -225,27 +270,11 @@ app.post("/api/messages", authenticateToken, async (req, res) => {
     }
 });
 
-
-
 // ==========================================
 // GET ALL CHAT MESSAGES API
 // ==========================================
-
-app.get("/api/messages", async (req, res) => {
+app.get("/api/messages", authenticateToken, async (req, res) => {
     try {
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({
-                success: false,
-                message: "Authorization token is required"
-            });
-        }
-
-        const token = authHeader.split(" ")[1];
-
-        jwt.verify(token, process.env.JWT_SECRET);
-
         const messages = await Message.find()
             .select("sender message createdAt")
             .sort({ createdAt: 1 });
@@ -258,14 +287,13 @@ app.get("/api/messages", async (req, res) => {
     } catch (error) {
         console.log("Get messages error:", error);
 
-        return res.status(401).json({
+        return res.status(500).json({
             success: false,
-            message: "Invalid or expired token"
+            message: "Internal server error"
         });
     }
 });
 
-
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

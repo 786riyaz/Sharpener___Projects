@@ -13,11 +13,48 @@ const messages = document.getElementById("messages");
 const messageForm = document.getElementById("messageForm");
 const messageInput = document.getElementById("messageInput");
 
+const renderedMessageIds = new Set();
+
 if (user) {
     sidebarUserName.textContent = user.name;
     profileAvatar.textContent = user.name.charAt(0).toUpperCase();
 }
 
+// ==========================================
+// SOCKET.IO CONNECTION
+// ==========================================
+const socket = io({
+    auth: {
+        token
+    }
+});
+
+socket.on("connect", () => {
+    console.log("Live chat connected:", socket.id);
+});
+
+socket.on("connect_error", (error) => {
+    console.error("Socket connection error:", error.message);
+
+    if (
+        error.message === "Authentication token is required" ||
+        error.message === "Invalid or expired token"
+    ) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+    }
+});
+
+// This event is received by ALL connected users whenever
+// any user sends a message.
+socket.on("newMessage", (chatMessage) => {
+    addMessageToChat(chatMessage, true);
+});
+
+// ==========================================
+// CHAT UI HELPERS
+// ==========================================
 function formatTime(dateValue) {
     const date = new Date(dateValue);
 
@@ -75,6 +112,35 @@ function createMessageElement(chatMessage) {
     return messageElement;
 }
 
+function addMessageToChat(chatMessage, shouldScroll = false) {
+    if (!chatMessage) {
+        return;
+    }
+
+    const messageId = chatMessage._id;
+
+    // REST POST response and Socket.IO event can arrive for
+    // the same message. This prevents duplicate rendering.
+    if (messageId && renderedMessageIds.has(String(messageId))) {
+        return;
+    }
+
+    if (messageId) {
+        renderedMessageIds.add(String(messageId));
+    }
+
+    messages.appendChild(
+        createMessageElement(chatMessage)
+    );
+
+    if (shouldScroll) {
+        scrollToBottom();
+    }
+}
+
+// ==========================================
+// LOAD OLD MESSAGES ON PAGE LOAD
+// ==========================================
 async function loadMessages() {
     try {
         const response = await fetch("/api/messages", {
@@ -91,6 +157,7 @@ async function loadMessages() {
         }
 
         messages.innerHTML = "";
+        renderedMessageIds.clear();
 
         const dateDivider = document.createElement("div");
         dateDivider.classList.add("date-divider");
@@ -102,9 +169,7 @@ async function loadMessages() {
         messages.appendChild(dateDivider);
 
         data.messages.forEach((chatMessage) => {
-            messages.appendChild(
-                createMessageElement(chatMessage)
-            );
+            addMessageToChat(chatMessage);
         });
 
         scrollToBottom();
@@ -114,7 +179,7 @@ async function loadMessages() {
 
         if (
             error.message === "Invalid or expired token" ||
-            error.message === "Authorization token is required"
+            error.message === "Authentication token is required"
         ) {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
@@ -135,6 +200,9 @@ async function loadMessages() {
     }
 }
 
+// ==========================================
+// SEND MESSAGE AND STORE IT IN DATABASE
+// ==========================================
 messageForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -169,20 +237,11 @@ messageForm.addEventListener("submit", async (event) => {
             throw new Error(data.message || "Unable to send message");
         }
 
-        // Exercise 4 backend returns the saved MongoDB document
-        // in data.chatMessage.
-        const savedMessage = data.chatMessage;
-
-        if (!savedMessage) {
-            throw new Error("Saved message was not returned by the server");
-        }
-
-        messages.appendChild(
-            createMessageElement(savedMessage)
-        );
+        // Add immediately for the sender. The later Socket.IO
+        // broadcast is ignored because the message ID is already known.
+        addMessageToChat(data.chatMessage, true);
 
         messageInput.value = "";
-        scrollToBottom();
         messageInput.focus();
 
     } catch (error) {
