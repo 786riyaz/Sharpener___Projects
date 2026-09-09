@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const path = require("path");
 
 const User = require("./models/User");
+const Message = require("./models/Message");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +24,42 @@ mongoose
         console.log("MongoDB connection error:", error);
     });
 
+// ==========================================
+// AUTH MIDDLEWARE
+// ==========================================
+function authenticateToken(req, res, next) {
+    try {
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication token is required"
+            });
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET
+        );
+
+        req.userId = decoded.userId;
+
+        next();
+
+    } catch (error) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid or expired token"
+        });
+    }
+}
+
+// ==========================================
+// SIGN UP API
+// ==========================================
 app.post("/api/signup", async (req, res) => {
     try {
         const { name, email, phone, password } = req.body;
@@ -36,8 +73,8 @@ app.post("/api/signup", async (req, res) => {
 
         const existingUser = await User.findOne({
             $or: [
-                { email: email },
-                { phone: phone }
+                { email: email.trim().toLowerCase() },
+                { phone: phone.trim() }
             ]
         });
 
@@ -51,9 +88,9 @@ app.post("/api/signup", async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = await User.create({
-            name,
-            email,
-            phone,
+            name: name.trim(),
+            email: email.trim().toLowerCase(),
+            phone: phone.trim(),
             password: hashedPassword
         });
 
@@ -78,6 +115,9 @@ app.post("/api/signup", async (req, res) => {
     }
 });
 
+// ==========================================
+// LOGIN API
+// ==========================================
 app.post("/api/login", async (req, res) => {
     try {
         const { login, password } = req.body;
@@ -89,10 +129,12 @@ app.post("/api/login", async (req, res) => {
             });
         }
 
+        const loginValue = login.trim();
+
         const user = await User.findOne({
             $or: [
-                { email: login },
-                { phone: login }
+                { email: loginValue.toLowerCase() },
+                { phone: loginValue }
             ]
         });
 
@@ -140,6 +182,41 @@ app.post("/api/login", async (req, res) => {
 
     } catch (error) {
         console.log("Login error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+});
+
+// ==========================================
+// CREATE CHAT MESSAGE API
+// ==========================================
+app.post("/api/messages", authenticateToken, async (req, res) => {
+    try {
+        const { message } = req.body;
+
+        if (!message || !message.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Message cannot be empty"
+            });
+        }
+
+        const newMessage = await Message.create({
+            sender: req.userId,
+            message: message.trim()
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Message stored successfully",
+            chatMessage: newMessage
+        });
+
+    } catch (error) {
+        console.log("Create message error:", error);
 
         return res.status(500).json({
             success: false,
