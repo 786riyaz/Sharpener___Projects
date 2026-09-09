@@ -23,7 +23,7 @@ if (user) {
 // ==========================================
 // SOCKET.IO CONNECTION
 // ==========================================
-const socket = io({
+const socket = io("http://localhost:3000", {
     auth: {
         token
     }
