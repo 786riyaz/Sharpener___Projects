@@ -18,8 +18,17 @@ const currentUserElement =
 const usersList =
     document.getElementById("usersList");
 
+const searchForm =
+    document.getElementById("searchForm");
+
 const searchInput =
     document.getElementById("searchInput");
+
+const joinUserButton =
+    document.getElementById("joinUserButton");
+
+const searchStatus =
+    document.getElementById("searchStatus");
 
 const chatTitle =
     document.getElementById("chatTitle");
@@ -44,15 +53,16 @@ currentUserElement.textContent =
 
 
 /*
-Exercise 12:
-Both users must generate exactly the same room ID.
+Exercise 13:
+Generate one deterministic room ID from two user emails.
 
 Example:
-    Jack -> Asif
-    Asif -> Jack
+    jack@example.com + asif@example.com
+and
+    asif@example.com + jack@example.com
 
-Both become:
-    personal:asif@email.com|jack@email.com
+Both generate:
+    personal:asif@example.com|jack@example.com
 */
 function createPersonalRoomId(
     emailA,
@@ -84,10 +94,8 @@ socket.on("connect", () => {
         socket.id
     );
 
-    /*
-    A socket reconnect creates a fresh server-side connection.
-    If a conversation is already selected, join that room again.
-    */
+    // A reconnect creates a fresh server-side socket.
+    // Join the selected room again if one is already active.
     if (currentRoomId) {
         joinCurrentRoom(
             currentRoomId
@@ -132,11 +140,6 @@ socket.on(
 );
 
 
-/*
-Exercise 12:
-Receive only messages emitted to the personal room that
-the client has currently selected.
-*/
 socket.on(
     "chat-message",
     (chatMessage) => {
@@ -163,6 +166,30 @@ function authHeaders() {
 }
 
 
+function setSearchStatus(
+    message,
+    isError = false
+) {
+    searchStatus.textContent =
+        message;
+
+    searchStatus.classList.toggle(
+        "error",
+        isError
+    );
+
+    searchStatus.classList.toggle(
+        "success",
+        !isError
+    );
+}
+
+
+/*
+Optional search suggestions are preserved from the previous UI.
+Exercise 13's actual security check happens through verifyUserByEmail()
+before a room is joined.
+*/
 async function loadUsers(
     search = ""
 ) {
@@ -188,8 +215,10 @@ async function loadUsers(
         usersList.innerHTML = "";
 
         if (data.users.length === 0) {
-            usersList.innerHTML =
-                "<p class='empty'>No users found</p>";
+            if (search.trim()) {
+                usersList.innerHTML =
+                    "<p class='empty'>No matching users found</p>";
+            }
 
             return;
         }
@@ -212,8 +241,11 @@ async function loadUsers(
                 button.addEventListener(
                     "click",
                     () => {
-                        selectUser(
-                            user
+                        searchInput.value =
+                            user.email;
+
+                        verifyAndJoinUser(
+                            user.email
                         );
                     }
                 );
@@ -241,12 +273,110 @@ searchInput.addEventListener(
 
 
 /*
-When the selected user changes:
+Exercise 13:
+Call the backend first and verify that the exact email belongs
+to a registered user. Only after this succeeds do we create/join
+the deterministic personal room.
+*/
+async function verifyUserByEmail(email) {
+    const response =
+        await fetch(
+            `/api/users/verify?email=${encodeURIComponent(email)}`,
+            {
+                headers:
+                    authHeaders()
+            }
+        );
+
+    const data =
+        await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.message ||
+                "Unable to verify user"
+        );
+    }
+
+    return data.user;
+}
+
+
+async function verifyAndJoinUser(email) {
+    const normalizedEmail =
+        String(email || "")
+            .trim()
+            .toLowerCase();
+
+    if (!normalizedEmail) {
+        setSearchStatus(
+            "Enter an email address first.",
+            true
+        );
+        return;
+    }
+
+    joinUserButton.disabled = true;
+
+    setSearchStatus(
+        "Verifying user..."
+    );
+
+    try {
+        const verifiedUser =
+            await verifyUserByEmail(
+                normalizedEmail
+            );
+
+        setSearchStatus(
+            "User verified. Creating the personal room..."
+        );
+
+        await selectUser(
+            verifiedUser
+        );
+
+        if (
+            selectedUser &&
+            currentRoomId
+        ) {
+            setSearchStatus(
+                `Connected with ${verifiedUser.email}`
+            );
+        }
+    } catch (error) {
+        setSearchStatus(
+            error.message ||
+                "Unable to verify user.",
+            true
+        );
+    } finally {
+        joinUserButton.disabled =
+            false;
+    }
+}
+
+
+searchForm.addEventListener(
+    "submit",
+    async (event) => {
+        event.preventDefault();
+
+        await verifyAndJoinUser(
+            searchInput.value
+        );
+    }
+);
+
+
+/*
+When the verified user changes:
 
 1. Leave the old room.
-2. Create a deterministic room ID.
-3. Join the new room.
-4. Load the stored MongoDB conversation.
+2. Sort both email addresses.
+3. Create one deterministic room ID.
+4. Emit join_room to the server.
+5. Load the stored MongoDB conversation.
 */
 async function selectUser(user) {
     const nextRoomId =
@@ -259,7 +389,14 @@ async function selectUser(user) {
         currentRoomId &&
         currentRoomId !== nextRoomId
     ) {
-        await leaveCurrentRoom();
+        const left =
+            await leaveCurrentRoom();
+
+        if (!left) {
+            throw new Error(
+                "Unable to leave the previous room"
+            );
+        }
     }
 
     selectedUser = user;
@@ -288,7 +425,9 @@ async function selectUser(user) {
         chatTitle.textContent =
             "Unable to join personal chat";
 
-        return;
+        throw new Error(
+            "Unable to join personal chat"
+        );
     }
 
     await loadConversation(
@@ -297,18 +436,18 @@ async function selectUser(user) {
 }
 
 
+/*
+Exercise 13:
+The client sends the unique deterministic room ID to the server
+using socket.emit("join_room", roomId).
+*/
 function joinCurrentRoom(roomId) {
     return new Promise((resolve) => {
         socket.emit(
-            "join-room",
+            "join_room",
             roomId,
             (response) => {
                 if (!response?.success) {
-                    alert(
-                        response?.message ||
-                            "Unable to join room"
-                    );
-
                     resolve(false);
                     return;
                 }
@@ -333,7 +472,7 @@ function leaveCurrentRoom() {
         }
 
         socket.emit(
-            "leave-room",
+            "leave_room",
             currentRoomId,
             (response) => {
                 if (
@@ -422,11 +561,6 @@ messageForm.addEventListener(
             return;
         }
 
-        /*
-        Exercise 12:
-        Send the message to the specific room ID instead of
-        broadcasting it to every connected user.
-        */
         socket.emit(
             "new-message",
             {

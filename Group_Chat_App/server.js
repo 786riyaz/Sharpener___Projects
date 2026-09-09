@@ -252,6 +252,74 @@ app.get(
 );
 
 
+// EXERCISE 13 - VERIFY A USER BEFORE JOINING A PERSONAL ROOM
+// This endpoint checks the exact email entered by the current user.
+// A room is NOT created from a dummy/non-existent email.
+app.get(
+    "/api/users/verify",
+    authenticateToken,
+    async (req, res) => {
+        try {
+            const email =
+                String(
+                    req.query.email || ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+            if (!email) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Email is required"
+                });
+            }
+
+            const user =
+                await User.findOne({
+                    email
+                })
+                    .select("_id name email");
+
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message:
+                        "No registered user exists with this email"
+                });
+            }
+
+            if (
+                String(user._id) ===
+                String(req.userId)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "You cannot start a personal chat with yourself"
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: "User verified successfully",
+                user
+            });
+        } catch (error) {
+            console.log(
+                "Verify user error:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Unable to verify user"
+            });
+        }
+    }
+);
+
+
 // GET PERSONAL MESSAGES
 app.get(
     "/api/personal-messages/:email",

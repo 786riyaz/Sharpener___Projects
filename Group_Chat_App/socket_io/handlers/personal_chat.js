@@ -75,7 +75,7 @@ module.exports = function personalChatHandler(socket, io) {
     Before joining a new room, the previously selected personal room is left.
     This prevents the socket from staying subscribed to old conversations.
     */
-    socket.on("join-room", async (roomId, callback) => {
+    const joinRoom = async (roomId, callback) => {
         try {
             const currentEmail =
                 normalizeEmail(socket.data.user.email);
@@ -152,13 +152,18 @@ module.exports = function personalChatHandler(socket, io) {
                 });
             }
         }
-    });
+    };
+
+    // Exercise 13 uses join_room. The old join-room alias is retained
+    // so previous exercise code does not break.
+    socket.on("join_room", joinRoom);
+    socket.on("join-room", joinRoom);
 
     /*
-    Exercise 12:
-    Explicitly leave the currently selected personal room.
+    Exercise 13:
+    Explicitly leave the current personal room.
     */
-    socket.on("leave-room", (roomId, callback) => {
+    const leaveRoom = (roomId, callback) => {
         const currentEmail =
             normalizeEmail(socket.data.user.email);
 
@@ -192,7 +197,10 @@ module.exports = function personalChatHandler(socket, io) {
                 roomId
             });
         }
-    });
+    };
+
+    socket.on("leave_room", leaveRoom);
+    socket.on("leave-room", leaveRoom);
 
     /*
     Exercise 12:

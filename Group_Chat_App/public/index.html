@@ -25,11 +25,31 @@
         <aside class="sidebar">
             <h2>Users</h2>
 
-            <input
-                id="searchInput"
-                type="text"
-                placeholder="Search by email"
+            <form
+                id="searchForm"
+                class="search-form"
             >
+                <input
+                    id="searchInput"
+                    type="email"
+                    placeholder="Enter registered user email"
+                    autocomplete="off"
+                >
+
+                <button
+                    type="submit"
+                    id="joinUserButton"
+                >
+                    Verify & Join
+                </button>
+            </form>
+
+            <p
+                id="searchStatus"
+                class="search-status"
+            >
+                Enter an exact registered email to verify the user before joining a room.
+            </p>
 
             <div
                 id="usersList"

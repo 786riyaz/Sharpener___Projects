@@ -240,3 +240,55 @@ button {
         min-height: 500px;
     }
 }
+
+
+/* Exercise 13 - exact user verification before joining a room */
+.search-form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.search-form input {
+    min-width: 0;
+}
+
+.search-form button {
+    cursor: pointer;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 6px;
+    background: #111;
+    color: #fff;
+}
+
+.search-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.search-status {
+    margin: 0 0 12px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #555;
+}
+
+.search-status.error {
+    color: #b42318;
+}
+
+.search-status.success {
+    color: #087443;
+}
+
+@media (max-width: 700px) {
+    .search-form {
+        grid-template-columns: 1fr;
+    }
+
+    .search-form button {
+        min-height: 42px;
+    }
+}
