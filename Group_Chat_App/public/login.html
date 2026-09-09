@@ -1,44 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Group Chat</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="container">
-        <form class="form" id="loginForm">
-            <h2>Welcome Back</h2>
-            <p>Login to your account</p>
+    <main class="auth-container">
+        <form id="loginForm" class="auth-card">
+            <h1>Welcome back</h1>
 
-            <label for="login">Email or Phone Number</label>
-            <input
-                type="text"
-                id="login"
-                placeholder="Enter email or phone number"
-                required
-            >
-
-            <label for="password">Password</label>
-            <input
-                type="password"
-                id="password"
-                placeholder="Enter your password"
-                required
-            >
+            <input id="identifier" type="text" placeholder="Email or phone number" required />
+            <input id="password" type="password" placeholder="Password" required />
 
             <button type="submit">Login</button>
 
-            <p class="link-text" id="message"></p>
-
-            <p class="link-text">
-                Don't have an account?
-                <a href="signup.html">Sign Up</a>
-            </p>
+            <p id="message"></p>
+            <p>New user? <a href="/signup.html">Create account</a></p>
         </form>
-    </div>
+    </main>
 
-    <script src="login.js"></script>
+    <script src="/auth.js"></script>
 </body>
 </html>
