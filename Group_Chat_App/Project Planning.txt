@@ -1,0 +1,31 @@
+Features :::
+1. Group Messaging
+2. Sent - Delivered Receipt - Read Receipt
+3. Online and Last Seen
+4. Image Sharing
+5. Chats Are Temporary / Permanent
+6. One to one chat
+====================================================================================
+Messaging ::: 
+CellPhone(Browser) ===> Send Message ===> Gatewat
+All the Connection are stored in sessions in Database
+
+Long Polling - HTTP
+Web Socket - TCP
+Read Receipt
+Delivered Receipt
+====================================================================================
+Last Seen ::: 
+A Table containing last activity timestamp of users interactions.
+====================================================================================
+Group Chat ::: 
+Group Service -- Session Service
+Member Limit - 200
+Table containing GroupID with UserID
+Message Queue
+====================================================================================
+Notify the user for the failed message.
+Idempotency
+Depriotize the last seen and other features
+====================================================================================
+====================================================================================
