@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="chat-page">
+    <div class="chat-app">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="profile-avatar" id="profileAvatar">U</div>
+                <div class="sidebar-actions">
+                    <button class="icon-button" title="New chat" aria-label="New chat">✎</button>
+                    <button class="icon-button" title="Menu" aria-label="Menu">⋮</button>
+                </div>
+            </div>
+
+            <div class="user-info">
+                <strong id="sidebarUserName">User</strong>
+                <span>Welcome to Group Chat</span>
+            </div>
+
+            <div class="search-box">
+                <span>⌕</span>
+                <input type="text" placeholder="Search or start a new chat">
+            </div>
+
+            <div class="chat-list">
+                <div class="chat-list-item active-chat">
+                    <div class="avatar group-avatar">G</div>
+                    <div class="chat-list-content">
+                        <div class="chat-list-title"><strong>Group Chat</strong><span>10:42 AM</span></div>
+                        <p>Welcome everyone! 👋</p>
+                    </div>
+                </div>
+                <div class="chat-list-item">
+                    <div class="avatar">A</div>
+                    <div class="chat-list-content">
+                        <div class="chat-list-title"><strong>Alex</strong><span>Yesterday</span></div>
+                        <p>See you soon!</p>
+                    </div>
+                </div>
+                <div class="chat-list-item">
+                    <div class="avatar">S</div>
+                    <div class="chat-list-content">
+                        <div class="chat-list-title"><strong>Sarah</strong><span>Monday</span></div>
+                        <p>Thanks!</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="chat-window">
+            <header class="chat-header">
+                <div class="chat-header-info">
+                    <div class="avatar group-avatar">G</div>
+                    <div><h2>Group Chat</h2><p>5 members</p></div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="icon-button" title="Search" aria-label="Search">⌕</button>
+                    <button class="icon-button" title="Menu" aria-label="Menu">⋮</button>
+                </div>
+            </header>
+
+            <section class="messages" id="messages">
+                <div class="date-divider"><span>TODAY</span></div>
+
+                <div class="message received">
+                    <div class="sender-name">Alex</div>
+                    <div class="message-text">Hey everyone! Welcome to the group 👋</div>
+                    <div class="message-meta"><span class="message-time">10:20 AM</span></div>
+                </div>
+
+                <div class="message received">
+                    <div class="sender-name sender-sarah">Sarah</div>
+                    <div class="message-text">Hi Alex! Glad to be here 😊</div>
+                    <div class="message-meta"><span class="message-time">10:22 AM</span></div>
+                </div>
+
+                <div class="message sent">
+                    <div class="message-text">Hello everyone! How is the project going?</div>
+                    <div class="message-meta"><span class="message-time">10:25 AM</span><span class="read-status">✓✓</span></div>
+                </div>
+
+                <div class="message received">
+                    <div class="sender-name">Alex</div>
+                    <div class="message-text">Going well! I just finished the authentication part.</div>
+                    <div class="message-meta"><span class="message-time">10:28 AM</span></div>
+                </div>
+
+                <div class="message received">
+                    <div class="sender-name sender-sarah">Sarah</div>
+                    <div class="message-text">Nice! The chat UI is looking good too.</div>
+                    <div class="message-meta"><span class="message-time">10:31 AM</span></div>
+                </div>
+
+                <div class="message sent">
+                    <div class="message-text">Great! Let's continue with the next task.</div>
+                    <div class="message-meta"><span class="message-time">10:35 AM</span><span class="read-status">✓✓</span></div>
+                </div>
+            </section>
+
+            <form class="message-input-area" id="messageForm">
+                <button type="button" class="icon-button emoji-button" aria-label="Emoji">☺</button>
+                <input type="text" id="messageInput" placeholder="Type a message" autocomplete="off">
+                <button type="submit" class="send-button" aria-label="Send message">➤</button>
+            </form>
+        </main>
+    </div>
+
+    <script src="chat.js"></script>
+</body>
+</html>

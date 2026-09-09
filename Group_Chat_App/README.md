@@ -51,3 +51,21 @@ Body:
 ```
 
 `login` can also contain the phone number.
+
+## Exercise 3 - Chat Window
+
+After successful login, the user is redirected to `chat.html`.
+
+The chat screen includes:
+
+- WhatsApp-style responsive layout
+- Sidebar and chat list
+- Chat header
+- Sent and received message bubbles
+- Sender names
+- Timestamps
+- Auto-scroll behavior
+- Message input box
+- Frontend-only message sending for this exercise
+
+Messages typed in the input box are currently displayed only in the browser UI. Database persistence and real-time messaging will be handled in later exercises.
