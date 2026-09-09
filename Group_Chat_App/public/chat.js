@@ -33,6 +33,13 @@ socket.on("connect", () => {
     console.log("Live chat connected:", socket.id);
 });
 
+socket.on("socketAuthenticated", (data) => {
+    console.log(
+        "Socket authenticated for user:",
+        data.user.userId
+    );
+});
+
 socket.on("connect_error", (error) => {
     console.error("Socket connection error:", error.message);
 

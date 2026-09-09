@@ -64,11 +64,20 @@ function authenticateToken(req, res, next) {
 }
 
 // ==========================================
-// SOCKET.IO JWT AUTHENTICATION
+// SOCKET.IO AUTHENTICATION MIDDLEWARE
 // ==========================================
+// The frontend sends the JWT while opening the Socket.IO connection:
+//
+// const socket = io("http://localhost:3000", {
+//     auth: { token }
+// });
+//
+// Socket.IO middleware runs BEFORE "connection".
+// If authentication fails, the client never reaches the
+// connection handler.
 io.use((socket, next) => {
     try {
-        const token = socket.handshake.auth.token;
+        const token = socket.handshake.auth?.token;
 
         if (!token) {
             return next(
@@ -81,10 +90,22 @@ io.use((socket, next) => {
             process.env.JWT_SECRET
         );
 
+        // Store the authenticated identity on the socket.
+        // socket.data is the recommended place for custom
+        // data associated with a Socket.IO connection.
+        socket.data.user = {
+            userId: decoded.userId,
+            email: decoded.email
+        };
+
+        // Kept as a convenient shortcut for the rest of this app.
         socket.userId = decoded.userId;
+
         next();
 
     } catch (error) {
+        console.log("Socket authentication failed:", error.message);
+
         next(new Error("Invalid or expired token"));
     }
 });
@@ -93,9 +114,19 @@ io.use((socket, next) => {
 // SOCKET.IO BACKEND
 // ==========================================
 io.on("connection", (socket) => {
-    console.log("New client connected");
+    // This connection exists only after JWT authentication succeeds.
+    const authenticatedUser = socket.data.user;
+
+    console.log("Authenticated client connected");
     console.log("Socket ID:", socket.id);
-    console.log("User ID:", socket.userId);
+    console.log("Authenticated User ID:", authenticatedUser.userId);
+    console.log("Authenticated Email:", authenticatedUser.email);
+
+    // Optional confirmation event. It also makes Socket Auth easy to test.
+    socket.emit("socketAuthenticated", {
+        success: true,
+        user: authenticatedUser
+    });
 
     // Listen for a message sent directly through Socket.IO.
     socket.on("sendMessage", async (messageText, callback) => {
@@ -114,8 +145,11 @@ io.on("connection", (socket) => {
             }
 
             // Store the message before broadcasting it.
+            // IMPORTANT:
+            // The sender is NOT accepted from the frontend.
+            // It is taken from the authenticated socket identity.
             const newMessage = await Message.create({
-                sender: socket.userId,
+                sender: socket.data.user.userId,
                 message: messageText.trim()
             });
 
