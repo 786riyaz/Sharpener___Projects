@@ -225,6 +225,47 @@ app.post("/api/messages", authenticateToken, async (req, res) => {
     }
 });
 
+
+
+// ==========================================
+// GET ALL CHAT MESSAGES API
+// ==========================================
+
+app.get("/api/messages", async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({
+                success: false,
+                message: "Authorization token is required"
+            });
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        jwt.verify(token, process.env.JWT_SECRET);
+
+        const messages = await Message.find()
+            .select("sender message createdAt")
+            .sort({ createdAt: 1 });
+
+        return res.status(200).json({
+            success: true,
+            messages
+        });
+
+    } catch (error) {
+        console.log("Get messages error:", error);
+
+        return res.status(401).json({
+            success: false,
+            message: "Invalid or expired token"
+        });
+    }
+});
+
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
