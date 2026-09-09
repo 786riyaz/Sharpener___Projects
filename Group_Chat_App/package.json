@@ -1,7 +1,8 @@
 {
-  "name": "group_chat_app",
+  "name": "socketio-chat-exercise-14",
   "version": "1.0.0",
-  "description": "Group Chat App - Socket.IO Exercises 9, 10 and 11",
+  "private": true,
+  "description": "Socket.IO personal and group chat with MongoDB, JWT authentication and room-based messaging",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",

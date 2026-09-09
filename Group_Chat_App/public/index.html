@@ -1,98 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-    <title>Socket.IO Personal Chat</title>
-    <link rel="stylesheet" href="/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Socket.IO Chat</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <header>
-        <h1>Socket.IO Chat</h1>
+  <div id="toast"></div>
 
-        <div class="header-user">
-            <span id="currentUser"></span>
-            <button id="logoutButton">
-                Logout
-            </button>
+  <main class="auth-shell" id="authView">
+    <section class="auth-card">
+      <div class="brand-block">
+        <div class="brand-icon">S</div>
+        <div>
+          <h1>Socket.IO Chat</h1>
+          <p>Personal and group messaging with real-time rooms.</p>
         </div>
-    </header>
+      </div>
 
-    <main class="app">
-        <aside class="sidebar">
-            <h2>Users</h2>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth="login">Login</button>
+        <button class="auth-tab" data-auth="signup">Create Account</button>
+      </div>
 
-            <form
-                id="searchForm"
-                class="search-form"
-            >
-                <input
-                    id="searchInput"
-                    type="email"
-                    placeholder="Enter registered user email"
-                    autocomplete="off"
-                >
+      <form id="loginForm" class="auth-form">
+        <label>Email or phone</label>
+        <input id="loginValue" required placeholder="you@example.com" />
+        <label>Password</label>
+        <input id="loginPassword" type="password" required placeholder="••••••••" />
+        <button class="primary-btn">Login</button>
+      </form>
 
-                <button
-                    type="submit"
-                    id="joinUserButton"
-                >
-                    Verify & Join
-                </button>
-            </form>
+      <form id="signupForm" class="auth-form hidden">
+        <label>Full name</label>
+        <input id="signupName" required placeholder="Your name" />
+        <label>Email</label>
+        <input id="signupEmail" type="email" required placeholder="you@example.com" />
+        <label>Phone</label>
+        <input id="signupPhone" required placeholder="9876543210" />
+        <label>Password</label>
+        <input id="signupPassword" type="password" required minlength="4" placeholder="Choose a password" />
+        <button class="primary-btn">Create Account</button>
+      </form>
+    </section>
+  </main>
 
-            <p
-                id="searchStatus"
-                class="search-status"
-            >
-                Enter an exact registered email to verify the user before joining a room.
-            </p>
+  <main class="app-shell hidden" id="appView">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="logo-row">
+          <div class="brand-icon small">S</div>
+          <span>Socket.IO Chat</span>
+        </div>
+        <div class="profile-card">
+          <strong id="currentUserName"></strong>
+          <span id="currentUserEmail"></span>
+        </div>
+      </div>
 
-            <div
-                id="usersList"
-                class="users-list"
-            ></div>
-        </aside>
+      <div class="nav-switch">
+        <button class="nav-btn active" data-panel="personalPanel">Personal</button>
+        <button class="nav-btn" data-panel="groupPanel">Groups</button>
+      </div>
 
-        <section class="chat-section">
-            <div class="chat-top">
-                <h2 id="chatTitle">
-                    Select a user to start personal chat
-                </h2>
-            </div>
+      <section id="personalPanel" class="side-panel">
+        <h3>Start a personal chat</h3>
+        <p class="hint">The entered email is verified against MongoDB before joining.</p>
+        <div class="input-row">
+          <input id="personalEmail" type="email" placeholder="Friend's email" />
+          <button id="startPersonalBtn" class="primary-btn compact">Chat</button>
+        </div>
+        <div id="personalResult" class="side-result"></div>
+      </section>
 
-            <div
-                id="messages"
-                class="messages"
-            ></div>
+      <section id="groupPanel" class="side-panel hidden">
+        <h3>Create group</h3>
+        <input id="groupName" placeholder="Group name" />
+        <textarea id="groupEmails" rows="3" placeholder="member1@email.com, member2@email.com"></textarea>
+        <button id="createGroupBtn" class="primary-btn full">Create Group</button>
 
-            <form
-                id="messageForm"
-                class="message-form"
-            >
-                <input
-                    id="messageInput"
-                    type="text"
-                    placeholder="Type a message here"
-                    autocomplete="off"
-                    disabled
-                >
+        <div class="section-title">Your groups</div>
+        <div id="groupList" class="group-list"></div>
+      </section>
 
-                <button
-                    type="submit"
-                    id="sendButton"
-                    disabled
-                >
-                    Send
-                </button>
-            </form>
-        </section>
-    </main>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </aside>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/index.js"></script>
+    <section class="chat-area">
+      <header class="chat-header">
+        <div>
+          <span class="eyebrow" id="chatTypeLabel">WELCOME</span>
+          <h2 id="chatTitle">Select a conversation</h2>
+          <p id="chatSubtitle">Start a personal chat or join a group.</p>
+        </div>
+        <div id="connectionStatus" class="status offline">Connecting…</div>
+      </header>
+
+      <div id="messages" class="messages">
+        <div class="empty-state">
+          <div class="empty-icon">💬</div>
+          <h3>No conversation selected</h3>
+          <p>Your room-based messages will appear here.</p>
+        </div>
+      </div>
+
+      <form id="messageForm" class="message-composer">
+        <input id="messageInput" autocomplete="off" placeholder="Select a conversation first" disabled />
+        <button id="sendBtn" class="primary-btn" disabled>Send</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

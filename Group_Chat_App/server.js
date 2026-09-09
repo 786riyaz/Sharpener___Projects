@@ -1,485 +1,308 @@
 require("dotenv").config();
 
+const path = require("path");
+const http = require("http");
 const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const path = require("path");
-const http = require("http");
+const { Server } = require("socket.io");
 
 const User = require("./models/User");
-const Message = require("./models/Message");
-const authenticateToken =
-    require("./middleware/auth");
-const setupSocketIO =
-    require("./socket_io");
+const Group = require("./models/Group");
+const authenticateToken = require("./middleware/auth");
+const registerChatHandlers = require("./socket/handlers/chat");
+const { normalizeEmail } = require("./utils/room");
 
 const app = express();
 const httpServer = http.createServer(app);
-
-// IMPORTANT:
-// Socket.IO is created only inside socket_io/index.js.
-// This avoids the "Identifier 'io' has already been declared" error.
-const io = setupSocketIO(httpServer);
+const io = new Server(httpServer);
 
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(
-    express.static(
-        path.join(__dirname, "public")
-    )
-);
+app.use(express.static(path.join(__dirname, "public")));
 
 mongoose
-    .connect(process.env.MONGODB_URI)
-    .then(() => {
-        console.log("MongoDB connected successfully");
-    })
-    .catch((error) => {
-        console.log(
-            "MongoDB connection error:",
-            error.message
-        );
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("MongoDB connected successfully"))
+  .catch((error) => console.error("MongoDB connection error:", error.message));
+
+// ---------------- AUTH ----------------
+
+app.post("/api/signup", async (req, res) => {
+  try {
+    const { name, email, phone, password } = req.body;
+
+    if (!name || !email || !phone || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required"
+      });
+    }
+
+    const normalizedEmail = normalizeEmail(email);
+
+    const existingUser = await User.findOne({
+      $or: [
+        { email: normalizedEmail },
+        { phone: String(phone).trim() }
+      ]
     });
 
-
-// SIGN UP
-app.post("/api/signup", async (req, res) => {
-    try {
-        const {
-            name,
-            email,
-            phone,
-            password
-        } = req.body;
-
-        if (
-            !name ||
-            !email ||
-            !phone ||
-            !password
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "All fields are required"
-            });
-        }
-
-        const normalizedEmail =
-            email.trim().toLowerCase();
-
-        const existingUser =
-            await User.findOne({
-                $or: [
-                    { email: normalizedEmail },
-                    { phone: phone.trim() }
-                ]
-            });
-
-        if (existingUser) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "User already exists with this email or phone number"
-            });
-        }
-
-        const hashedPassword =
-            await bcrypt.hash(password, 10);
-
-        const newUser =
-            await User.create({
-                name: name.trim(),
-                email: normalizedEmail,
-                phone: phone.trim(),
-                password: hashedPassword
-            });
-
-        return res.status(201).json({
-            success: true,
-            message: "User registered successfully",
-            user: {
-                id: newUser._id,
-                name: newUser.name,
-                email: newUser.email,
-                phone: newUser.phone
-            }
-        });
-    } catch (error) {
-        console.log("Signup error:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: "Internal server error"
-        });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists with this email or phone number"
+      });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      name: String(name).trim(),
+      email: normalizedEmail,
+      phone: String(phone).trim(),
+      password: hashedPassword
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone
+      }
+    });
+  } catch (error) {
+    console.error("Signup error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
 });
 
-
-// LOGIN
 app.post("/api/login", async (req, res) => {
-    try {
-        const {
-            login,
-            password
-        } = req.body;
+  try {
+    const { login, password } = req.body;
 
-        if (!login || !password) {
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Login and password are required"
-            });
-        }
-
-        const loginValue = login.trim();
-
-        const user = await User.findOne({
-            $or: [
-                {
-                    email:
-                        loginValue.toLowerCase()
-                },
-                {
-                    phone: loginValue
-                }
-            ]
-        });
-
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message:
-                    "Invalid email/phone or password"
-            });
-        }
-
-        const isPasswordCorrect =
-            await bcrypt.compare(
-                password,
-                user.password
-            );
-
-        if (!isPasswordCorrect) {
-            return res.status(401).json({
-                success: false,
-                message:
-                    "Invalid email/phone or password"
-            });
-        }
-
-        const token = jwt.sign(
-            {
-                userId: user._id,
-                email: user.email
-            },
-            process.env.JWT_SECRET,
-            {
-                expiresIn: "7d"
-            }
-        );
-
-        return res.status(200).json({
-            success: true,
-            message: "Login successful",
-            token,
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone
-            }
-        });
-    } catch (error) {
-        console.log("Login error:", error);
-
-        return res.status(500).json({
-            success: false,
-            message: "Internal server error"
-        });
+    if (!login || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Login and password are required"
+      });
     }
+
+    const loginValue = String(login).trim();
+
+    const user = await User.findOne({
+      $or: [
+        { email: loginValue.toLowerCase() },
+        { phone: loginValue }
+      ]
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email/phone or password"
+      });
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password);
+
+    if (!validPassword) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email/phone or password"
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        userId: user._id.toString(),
+        email: user.email
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return res.json({
+      success: true,
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone
+      }
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
 });
 
+// ---------------- USER VALIDATION ----------------
 
-// SEARCH USERS FOR PERSONAL CHAT
-app.get(
-    "/api/users",
-    authenticateToken,
-    async (req, res) => {
-        try {
-            const search =
-                String(
-                    req.query.email || ""
-                )
-                    .trim()
-                    .toLowerCase();
+app.get("/api/users/exists", authenticateToken, async (req, res) => {
+  try {
+    const email = normalizeEmail(req.query.email);
 
-            const users = await User.find({
-                _id: {
-                    $ne: req.userId
-                },
-                ...(search
-                    ? {
-                        email: {
-                            $regex: search,
-                            $options: "i"
-                        }
-                    }
-                    : {})
-            })
-                .select("_id name email")
-                .sort({ name: 1 })
-                .limit(20);
-
-            return res.json({
-                success: true,
-                users
-            });
-        } catch (error) {
-            console.log(
-                "User search error:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Unable to search users"
-            });
-        }
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required"
+      });
     }
-);
 
+    const user = await User.findOne({ email }).select("_id name email");
 
-// EXERCISE 13 - VERIFY A USER BEFORE JOINING A PERSONAL ROOM
-// This endpoint checks the exact email entered by the current user.
-// A room is NOT created from a dummy/non-existent email.
-app.get(
-    "/api/users/verify",
-    authenticateToken,
-    async (req, res) => {
-        try {
-            const email =
-                String(
-                    req.query.email || ""
-                )
-                    .trim()
-                    .toLowerCase();
-
-            if (!email) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Email is required"
-                });
-            }
-
-            const user =
-                await User.findOne({
-                    email
-                })
-                    .select("_id name email");
-
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message:
-                        "No registered user exists with this email"
-                });
-            }
-
-            if (
-                String(user._id) ===
-                String(req.userId)
-            ) {
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        "You cannot start a personal chat with yourself"
-                });
-            }
-
-            return res.status(200).json({
-                success: true,
-                message: "User verified successfully",
-                user
-            });
-        } catch (error) {
-            console.log(
-                "Verify user error:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Unable to verify user"
-            });
-        }
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
     }
-);
 
+    return res.json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    console.error("User validation error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+});
 
-// GET PERSONAL MESSAGES
-app.get(
-    "/api/personal-messages/:email",
-    authenticateToken,
-    async (req, res) => {
-        try {
-            const otherUser =
-                await User.findOne({
-                    email:
-                        req.params.email
-                            .trim()
-                            .toLowerCase()
-                }).select("_id");
+// ---------------- GROUPS ----------------
 
-            if (!otherUser) {
-                return res.status(404).json({
-                    success: false,
-                    message:
-                        "User not found"
-                });
-            }
+app.post("/api/groups", authenticateToken, async (req, res) => {
+  try {
+    const { name, memberEmails = [] } = req.body;
 
-            const messages =
-                await Message.find({
-                    type: "personal",
-                    $or: [
-                        {
-                            sender: req.userId,
-                            receiver:
-                                otherUser._id
-                        },
-                        {
-                            sender:
-                                otherUser._id,
-                            receiver: req.userId
-                        }
-                    ]
-                })
-                    .sort({ createdAt: 1 })
-                    .limit(100)
-                    .select(
-                        "sender receiver roomId message type createdAt"
-                    );
-
-            return res.json({
-                success: true,
-                messages
-            });
-        } catch (error) {
-            console.log(
-                "Get personal messages error:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Unable to get messages"
-            });
-        }
+    if (!name || !String(name).trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Group name is required"
+      });
     }
-);
 
+    const normalizedEmails = [
+      req.user.email,
+      ...memberEmails.map(normalizeEmail)
+    ].filter(Boolean);
 
-// BACKWARD-COMPATIBLE REST GROUP MESSAGE API
-app.post(
-    "/api/messages",
-    authenticateToken,
-    async (req, res) => {
-        try {
-            const { message } = req.body;
+    const uniqueEmails = [...new Set(normalizedEmails)];
 
-            if (
-                !message ||
-                !message.trim()
-            ) {
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        "Message cannot be empty"
-                });
-            }
+    const users = await User.find({
+      email: { $in: uniqueEmails }
+    }).select("_id email");
 
-            const newMessage =
-                await Message.create({
-                    sender: req.userId,
-                    message:
-                        message.trim(),
-                    type: "group"
-                });
+    if (users.length !== uniqueEmails.length) {
+      const foundEmails = new Set(users.map((user) => user.email));
+      const missingEmails = uniqueEmails.filter((email) => !foundEmails.has(email));
 
-            io.emit(
-                "newMessage",
-                newMessage
-            );
-
-            return res.status(201).json({
-                success: true,
-                message:
-                    "Message stored and broadcast successfully",
-                chatMessage: newMessage
-            });
-        } catch (error) {
-            console.log(
-                "Create message error:",
-                error
-            );
-
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Internal server error"
-            });
-        }
+      return res.status(400).json({
+        success: false,
+        message: `These users do not exist: ${missingEmails.join(", ")}`
+      });
     }
-);
 
+    const memberIds = users.map((user) => user._id);
 
-// GET GROUP MESSAGES
-app.get(
-    "/api/messages",
-    authenticateToken,
-    async (req, res) => {
-        try {
-            const messages =
-                await Message.find({
-                    type: "group"
-                })
-                    .select(
-                        "sender message createdAt"
-                    )
-                    .sort({
-                        createdAt: 1
-                    });
+    const group = new Group({
+      name: String(name).trim(),
+      roomId: `group:${new mongoose.Types.ObjectId().toString()}`,
+      createdBy: req.user.userId,
+      members: memberIds
+    });
 
-            return res.status(200).json({
-                success: true,
-                messages
-            });
-        } catch (error) {
-            console.log(
-                "Get messages error:",
-                error
-            );
+    await group.save();
+    await group.populate("members", "name email");
 
-            return res.status(500).json({
-                success: false,
-                message:
-                    "Internal server error"
-            });
-        }
+    return res.status(201).json({
+      success: true,
+      group
+    });
+  } catch (error) {
+    console.error("Create group error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to create group"
+    });
+  }
+});
+
+app.get("/api/groups", authenticateToken, async (req, res) => {
+  try {
+    const groups = await Group.find({
+      members: req.user.userId
+    })
+      .populate("members", "name email")
+      .sort({ updatedAt: -1, createdAt: -1 });
+
+    return res.json({
+      success: true,
+      groups
+    });
+  } catch (error) {
+    console.error("Get groups error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to load groups"
+    });
+  }
+});
+
+// ---------------- SOCKET AUTH ----------------
+
+io.use((socket, next) => {
+  try {
+    const token = socket.handshake.auth?.token;
+
+    if (!token) {
+      return next(new Error("Authentication token is required"));
     }
-);
 
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-// Start HTTP server.
-// Do NOT use app.listen() because Socket.IO is attached
-// to httpServer.
+    socket.data.user = {
+      userId: decoded.userId,
+      email: decoded.email
+    };
+
+    next();
+  } catch (error) {
+    next(new Error("Invalid or expired token"));
+  }
+});
+
+io.on("connection", (socket) => {
+  console.log(`Authenticated socket connected: ${socket.id} | ${socket.data.user.email}`);
+
+  socket.emit("socket_authenticated", {
+    success: true,
+    user: socket.data.user
+  });
+
+  registerChatHandlers(io, socket);
+});
+
 httpServer.listen(PORT, () => {
-    console.log(
-        `Socket.IO server running on http://localhost:${PORT}`
-    );
+  console.log(`Server running on http://localhost:${PORT}`);
 });

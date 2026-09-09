@@ -1,36 +1,37 @@
 const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema(
-    {
-        sender: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true
-        },
-        receiver: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            default: null
-        },
-        roomId: {
-            type: String,
-            default: null,
-            index: true
-        },
-        message: {
-            type: String,
-            required: true,
-            trim: true
-        },
-        type: {
-            type: String,
-            enum: ["group", "personal"],
-            default: "group"
-        }
+  {
+    chatType: {
+      type: String,
+      enum: ["personal", "group"],
+      required: true
     },
-    {
-        timestamps: true
+    roomId: {
+      type: String,
+      required: true,
+      index: true
+    },
+    groupId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Group",
+      default: null
+    },
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    text: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 2000
     }
+  },
+  { timestamps: true }
 );
+
+messageSchema.index({ roomId: 1, createdAt: 1 });
 
 module.exports = mongoose.model("Message", messageSchema);
