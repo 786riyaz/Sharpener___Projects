@@ -12,9 +12,10 @@ const User = require("./models/User");
 const Message = require("./models/Message");
 
 const app = express();
-const server = http.createServer(app);
+const httpServer = http.createServer(app);
 
-const io = new Server(server);
+// Socket.IO server attached to the HTTP server.
+const io = new Server(httpServer);
 
 const PORT = process.env.PORT || 3000;
 
@@ -31,7 +32,7 @@ mongoose
     });
 
 // ==========================================
-// AUTH MIDDLEWARE FOR REST APIs
+// JWT AUTHENTICATION FOR REST APIs
 // ==========================================
 function authenticateToken(req, res, next) {
     try {
@@ -52,7 +53,6 @@ function authenticateToken(req, res, next) {
         );
 
         req.userId = decoded.userId;
-
         next();
 
     } catch (error) {
@@ -64,14 +64,16 @@ function authenticateToken(req, res, next) {
 }
 
 // ==========================================
-// SOCKET.IO AUTHENTICATION
+// SOCKET.IO JWT AUTHENTICATION
 // ==========================================
 io.use((socket, next) => {
     try {
         const token = socket.handshake.auth.token;
 
         if (!token) {
-            return next(new Error("Authentication token is required"));
+            return next(
+                new Error("Authentication token is required")
+            );
         }
 
         const decoded = jwt.verify(
@@ -80,7 +82,6 @@ io.use((socket, next) => {
         );
 
         socket.userId = decoded.userId;
-
         next();
 
     } catch (error) {
@@ -88,13 +89,63 @@ io.use((socket, next) => {
     }
 });
 
+// ==========================================
+// SOCKET.IO BACKEND
+// ==========================================
 io.on("connection", (socket) => {
-    console.log(
-        `Socket connected: ${socket.id} | User: ${socket.userId}`
-    );
+    console.log("New client connected");
+    console.log("Socket ID:", socket.id);
+    console.log("User ID:", socket.userId);
 
-    socket.on("disconnect", () => {
-        console.log(`Socket disconnected: ${socket.id}`);
+    // Listen for a message sent directly through Socket.IO.
+    socket.on("sendMessage", async (messageText, callback) => {
+        try {
+            if (!messageText || !messageText.trim()) {
+                const errorMessage = "Message cannot be empty";
+
+                if (typeof callback === "function") {
+                    callback({
+                        success: false,
+                        message: errorMessage
+                    });
+                }
+
+                return;
+            }
+
+            // Store the message before broadcasting it.
+            const newMessage = await Message.create({
+                sender: socket.userId,
+                message: messageText.trim()
+            });
+
+            // Send the new message to every connected client.
+            io.emit("newMessage", newMessage);
+
+            if (typeof callback === "function") {
+                callback({
+                    success: true,
+                    message: "Message sent successfully",
+                    chatMessage: newMessage
+                });
+            }
+
+        } catch (error) {
+            console.log("Socket sendMessage error:", error);
+
+            if (typeof callback === "function") {
+                callback({
+                    success: false,
+                    message: "Unable to send message"
+                });
+            }
+        }
+    });
+
+    socket.on("disconnect", (reason) => {
+        console.log(
+            `Client disconnected: ${socket.id} | Reason: ${reason}`
+        );
     });
 });
 
@@ -122,7 +173,8 @@ app.post("/api/signup", async (req, res) => {
         if (existingUser) {
             return res.status(400).json({
                 success: false,
-                message: "User already exists with this email or phone number"
+                message:
+                    "User already exists with this email or phone number"
             });
         }
 
@@ -232,7 +284,8 @@ app.post("/api/login", async (req, res) => {
 });
 
 // ==========================================
-// CREATE CHAT MESSAGE API
+// REST MESSAGE API
+// Kept for backward compatibility with Exercise 4-7.
 // ==========================================
 app.post("/api/messages", authenticateToken, async (req, res) => {
     try {
@@ -250,8 +303,7 @@ app.post("/api/messages", authenticateToken, async (req, res) => {
             message: message.trim()
         });
 
-        // Broadcast the saved message to every connected user.
-        // All clients receive this event live without refreshing.
+        // Broadcast to all connected Socket.IO clients.
         io.emit("newMessage", newMessage);
 
         return res.status(201).json({
@@ -271,7 +323,7 @@ app.post("/api/messages", authenticateToken, async (req, res) => {
 });
 
 // ==========================================
-// GET ALL CHAT MESSAGES API
+// GET ALL MESSAGES API
 // ==========================================
 app.get("/api/messages", authenticateToken, async (req, res) => {
     try {
@@ -294,6 +346,11 @@ app.get("/api/messages", authenticateToken, async (req, res) => {
     }
 });
 
-server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+// IMPORTANT:
+// Start the HTTP server, not `app.listen()`.
+// Socket.IO is attached to `httpServer`.
+httpServer.listen(PORT, () => {
+    console.log(
+        `Server with Socket.IO is running on http://localhost:${PORT}`
+    );
 });
