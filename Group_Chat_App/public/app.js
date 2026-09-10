@@ -137,16 +137,55 @@ function appendMessage(message) {
     ? "You"
     : (message.sender?.name || message.sender?.email || "User");
 
-  element.innerHTML = `
-    <div class="message-meta">${senderName} · ${formatTime(message.createdAt)}</div>
-    <div class="message-text"></div>
-  `;
+  const meta = document.createElement("div");
+  meta.className = "message-meta";
+  meta.textContent = `${senderName} · ${formatTime(message.createdAt)}`;
+  element.appendChild(meta);
 
-  element.querySelector(".message-text").textContent = message.text;
+  if (message.text) {
+    const text = document.createElement("div");
+    text.className = "message-text";
+    text.textContent = message.text;
+    element.appendChild(text);
+  }
+
+  if (message.media?.url) {
+    const mediaWrap = document.createElement("div");
+    mediaWrap.className = "media-message";
+    const mime = message.media.mimeType || "";
+
+    if (mime.startsWith("image/")) {
+      const image = document.createElement("img");
+      image.src = message.media.url;
+      image.alt = message.media.originalName || "Shared image";
+      image.loading = "lazy";
+      mediaWrap.appendChild(image);
+    } else if (mime.startsWith("video/")) {
+      const video = document.createElement("video");
+      video.src = message.media.url;
+      video.controls = true;
+      video.preload = "metadata";
+      mediaWrap.appendChild(video);
+    } else if (mime.startsWith("audio/")) {
+      const audio = document.createElement("audio");
+      audio.src = message.media.url;
+      audio.controls = true;
+      mediaWrap.appendChild(audio);
+    } else {
+      const link = document.createElement("a");
+      link.href = message.media.url;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = `📎 ${message.media.originalName || "Download file"}`;
+      mediaWrap.appendChild(link);
+    }
+
+    element.appendChild(mediaWrap);
+  }
+
   $("messages").appendChild(element);
   $("messages").scrollTop = $("messages").scrollHeight;
 }
-
 function renderMessages(messages) {
   clearMessages();
 
@@ -170,6 +209,7 @@ function setChatHeader(type, title, subtitle) {
   $("chatSubtitle").textContent = subtitle;
   $("messageInput").disabled = false;
   $("sendBtn").disabled = false;
+  $("mediaBtn").disabled = false;
   $("messageInput").placeholder = "Type a message";
 }
 
@@ -189,6 +229,7 @@ function joinRoom(payload, title, subtitle) {
 
       state.currentRoom = result.roomId;
       state.currentChatType = payload.chatType;
+      if (payload.chatType !== "group") state.currentGroup = null;
 
       renderMessages(result.messages || []);
       setChatHeader(payload.chatType, title, subtitle);
@@ -322,6 +363,59 @@ function sendMessage(event) {
   });
 }
 
+function selectMedia() {
+  if (!state.currentRoom) {
+    return showToast("Select a conversation before sharing media", "error");
+  }
+
+  $("mediaInput").click();
+}
+
+async function uploadSelectedMedia() {
+  const file = $("mediaInput").files[0];
+  if (!file) return;
+
+  if (!state.currentRoom || !state.currentChatType) {
+    $("mediaInput").value = "";
+    return showToast("Select a conversation before sharing media", "error");
+  }
+
+  const formData = new FormData();
+  formData.append("media", file);
+  formData.append("roomId", state.currentRoom);
+  formData.append("chatType", state.currentChatType);
+  if (state.currentGroup?._id && state.currentChatType === "group") {
+    formData.append("groupId", state.currentGroup._id);
+  }
+
+  try {
+    $("uploadStatus").textContent = `Uploading ${file.name}…`;
+    $("mediaBtn").disabled = true;
+
+    const response = await fetch("/api/media/upload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${state.token}`
+      },
+      body: formData
+    });
+
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.message || "Media upload failed");
+
+    $("uploadStatus").textContent = "Upload complete";
+    showToast("Media shared successfully");
+  } catch (error) {
+    $("uploadStatus").textContent = "Upload failed";
+    showToast(error.message || "Unable to upload media", "error");
+  } finally {
+    $("mediaBtn").disabled = false;
+    $("mediaInput").value = "";
+    setTimeout(() => {
+      $("uploadStatus").textContent = "";
+    }, 2500);
+  }
+}
 async function login(event) {
   event.preventDefault();
 
@@ -412,6 +506,8 @@ $("signupForm").addEventListener("submit", signup);
 $("startPersonalBtn").addEventListener("click", startPersonalChat);
 $("createGroupBtn").addEventListener("click", createGroup);
 $("messageForm").addEventListener("submit", sendMessage);
+$("mediaBtn").addEventListener("click", selectMedia);
+$("mediaInput").addEventListener("change", uploadSelectedMedia);
 $("logoutBtn").addEventListener("click", logout);
 
 if (state.token && state.user) {

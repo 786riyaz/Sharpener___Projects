@@ -106,9 +106,12 @@
       </div>
 
       <form id="messageForm" class="message-composer">
+        <button id="mediaBtn" type="button" class="media-btn" disabled title="Share media">📎</button>
+        <input id="mediaInput" type="file" accept="image/*,video/*,audio/*,.pdf,.txt,.zip,.doc,.docx" hidden />
         <input id="messageInput" autocomplete="off" placeholder="Select a conversation first" disabled />
         <button id="sendBtn" class="primary-btn" disabled>Send</button>
       </form>
+      <div id="uploadStatus" class="upload-status"></div>
     </section>
   </main>
 

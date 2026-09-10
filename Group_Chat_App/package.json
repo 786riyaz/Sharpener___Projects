@@ -1,8 +1,8 @@
 {
-  "name": "socketio-chat-exercise-14",
+  "name": "socketio-chat-exercise-15",
   "version": "1.0.0",
   "private": true,
-  "description": "Socket.IO personal and group chat with MongoDB, JWT authentication and room-based messaging",
+  "description": "Socket.IO personal and group chat with MongoDB, AWS S3 media sharing and JWT authentication",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
@@ -14,7 +14,9 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "@aws-sdk/client-s3": "^3.758.0",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

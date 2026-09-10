@@ -24,9 +24,16 @@ const messageSchema = new mongoose.Schema(
     },
     text: {
       type: String,
-      required: true,
+      default: "",
       trim: true,
       maxlength: 2000
+    },
+    media: {
+      key: { type: String, default: null },
+      url: { type: String, default: null },
+      originalName: { type: String, default: null },
+      mimeType: { type: String, default: null },
+      size: { type: Number, default: null }
     }
   },
   { timestamps: true }

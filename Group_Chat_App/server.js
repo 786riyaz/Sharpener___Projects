@@ -11,8 +11,11 @@ const { Server } = require("socket.io");
 const User = require("./models/User");
 const Group = require("./models/Group");
 const authenticateToken = require("./middleware/auth");
+const upload = require("./middleware/upload");
+const { uploadMedia } = require("./services/s3");
+const Message = require("./models/Message");
 const registerChatHandlers = require("./socket/handlers/chat");
-const { normalizeEmail } = require("./utils/room");
+const { normalizeEmail, createPersonalRoomId } = require("./utils/room");
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -265,6 +268,88 @@ app.get("/api/groups", authenticateToken, async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Unable to load groups"
+    });
+  }
+});
+
+
+// ---------------- MEDIA UPLOAD (AWS S3 + SOCKET.IO) ----------------
+
+app.post("/api/media/upload", authenticateToken, upload.single("media"), async (req, res) => {
+  try {
+    const roomId = String(req.body.roomId || "").trim();
+    const chatType = String(req.body.chatType || "").trim();
+    const groupId = String(req.body.groupId || "").trim() || null;
+    const caption = String(req.body.caption || "").trim();
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "Media file is required" });
+    }
+
+    if (!roomId || !chatType) {
+      return res.status(400).json({ success: false, message: "roomId and chatType are required" });
+    }
+
+    if (caption.length > 2000) {
+      return res.status(400).json({ success: false, message: "Caption is too long" });
+    }
+
+    if (chatType === "personal") {
+      const parts = roomId.split("::").map(normalizeEmail).filter(Boolean);
+      if (parts.length !== 2 || !parts.includes(req.user.email)) {
+        return res.status(403).json({ success: false, message: "You are not allowed to upload to this personal room" });
+      }
+
+      const [firstUser, secondUser] = parts;
+      if (createPersonalRoomId(firstUser, secondUser) !== roomId) {
+        return res.status(400).json({ success: false, message: "Invalid personal room ID" });
+      }
+
+      const users = await User.countDocuments({ email: { $in: parts } });
+      if (users !== 2) {
+        return res.status(400).json({ success: false, message: "Both users must exist before media can be shared" });
+      }
+    } else if (chatType === "group") {
+      if (!groupId) {
+        return res.status(400).json({ success: false, message: "groupId is required for a group upload" });
+      }
+
+      const group = await Group.findOne({
+        _id: groupId,
+        roomId,
+        members: req.user.userId
+      }).select("_id");
+
+      if (!group) {
+        return res.status(403).json({ success: false, message: "You are not allowed to upload to this group" });
+      }
+    } else {
+      return res.status(400).json({ success: false, message: "Invalid chat type" });
+    }
+
+    const media = await uploadMedia(req.file);
+
+    const message = await Message.create({
+      chatType,
+      roomId,
+      groupId: groupId || null,
+      sender: req.user.userId,
+      text: caption,
+      media
+    });
+
+    await message.populate("sender", "name email");
+
+    // The HTTP upload finishes first. Then Socket.IO delivers the media message
+    // only to the relevant personal/group room.
+    io.to(roomId).emit("new_message", message);
+
+    return res.status(201).json({ success: true, message });
+  } catch (error) {
+    console.error("Media upload error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Unable to upload media"
     });
   }
 });
