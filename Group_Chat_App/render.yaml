@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: socketio-chat-exercise-16
+    runtime: node
+    buildCommand: npm install
+    # buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: PORT
+        value: 10000
+
+      - key: MONGODB_URI
+        sync: false
+
+      - key: JWT_SECRET
+        generateValue: true
+        
+      - key: AWS_REGION
+        sync: false
+
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+        
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+        
+      - key: S3_BUCKET_NAME
+        sync: false

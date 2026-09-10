@@ -11,7 +11,7 @@ const { Server } = require("socket.io");
 const User = require("./models/User");
 const Group = require("./models/Group");
 const authenticateToken = require("./middleware/auth");
-const upload = require("./middleware/upload");
+const { upload, MAX_FILE_SIZE } = require("./middleware/upload");
 const { uploadMedia } = require("./services/s3");
 const Message = require("./models/Message");
 const registerChatHandlers = require("./socket/handlers/chat");
@@ -275,6 +275,17 @@ app.get("/api/groups", authenticateToken, async (req, res) => {
 
 // ---------------- MEDIA UPLOAD (AWS S3 + SOCKET.IO) ----------------
 
+// The client uses this endpoint only for a user-facing upload limit. The
+// server-side multer limit remains the source of truth.
+app.get("/api/media/config", authenticateToken, (req, res) => {
+  res.json({
+    success: true,
+    maxFileSize: MAX_FILE_SIZE,
+    maxFiles: 10
+  });
+});
+
+
 app.post("/api/media/upload", authenticateToken, upload.single("media"), async (req, res) => {
   try {
     const roomId = String(req.body.roomId || "").trim();
@@ -354,6 +365,28 @@ app.post("/api/media/upload", authenticateToken, upload.single("media"), async (
   }
 });
 
+// Convert upload middleware errors into predictable JSON for the frontend.
+app.use((error, req, res, next) => {
+  if (!error) return next();
+
+  if (error.code === "LIMIT_FILE_SIZE") {
+    return res.status(413).json({
+      success: false,
+      message: `Each file must be ${Math.floor(MAX_FILE_SIZE / (1024 * 1024))} MB or smaller`
+    });
+  }
+
+  if (error.code === "LIMIT_FILE_COUNT") {
+    return res.status(400).json({ success: false, message: "Too many files selected" });
+  }
+
+  if (error.message === "This file type is not supported") {
+    return res.status(415).json({ success: false, message: error.message });
+  }
+
+  return next(error);
+});
+
 // ---------------- SOCKET AUTH ----------------
 
 io.use((socket, next) => {
@@ -388,6 +421,11 @@ io.on("connection", (socket) => {
   registerChatHandlers(io, socket);
 });
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// httpServer.listen(PORT, () => {
+//   console.log(`Server running on http://localhost:${PORT}`);
+// });
+
+// Added 0.0.0.0 for render traffic 
+httpServer.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
 });
