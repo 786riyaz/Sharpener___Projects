@@ -9,10 +9,10 @@ build
 Documentations ::: 
 000 Docs
 000 UT
+00_UT
 README.md
 =============================================================
 Uploaded Images and Other Images :::
-public
 storage
 favicon.ico
 =============================================================
@@ -24,8 +24,10 @@ Merge Files :::
 merge-ignore.txt
 Merged Files.txt
 mergeFiles.js
+00_File_Merger_Tool
 =============================================================
 Generally Ignoring
+00_Old_Versions
 .gitignore
 eslint.config.mjs
 next-env.d.ts
@@ -33,16 +35,12 @@ next.config.ts
 postcss.config.mjs
 tsconfig.json
 .env.local
+.env
 =============================================================
-00_File_Merger_Tool
-00_Old_Versions
 00_SRS
-00_UT
-utils
 Database
 III_logs
 III_globals.css
-000 Pending Things to do.md
-000 Riyaz Notes.md
-New UI HTML
+00_Pending
+00_Riyaz_Notes
 000_Notes

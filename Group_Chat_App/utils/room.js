@@ -3,21 +3,7 @@ function normalizeEmail(email) {
 }
 
 function createPersonalRoomId(emailA, emailB) {
-  const first = normalizeEmail(emailA);
-  const second = normalizeEmail(emailB);
-
-  if (!first || !second) {
-    throw new Error("Both email addresses are required");
-  }
-
-  if (first === second) {
-    throw new Error("You cannot create a personal chat with yourself");
-  }
-
-  return [first, second].sort().join("::");
+  return [normalizeEmail(emailA), normalizeEmail(emailB)].sort().join("::");
 }
 
-module.exports = {
-  normalizeEmail,
-  createPersonalRoomId
-};
+module.exports = { normalizeEmail, createPersonalRoomId };
