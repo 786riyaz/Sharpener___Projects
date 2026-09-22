@@ -1,11 +1,11 @@
 /**
-* Gemini prompt templates for Exercise 18.
-*
-* Edit this file whenever you want to tune AI behaviour without touching
-* Gemini API/retry logic in services/geminiService.js.
-*/
+ * Gemini prompt templates for Exercise 18.
+ *
+ * Edit this file whenever you want to tune AI behaviour without touching
+ * Gemini API/retry logic in services/geminiService.js.
+ */
 function buildPredictiveTypingPrompt({ draft, context, style }) {
-return `
+  return `
 ROLE
 You are the predictive typing engine inside a real-time chat application.
 GOAL
@@ -51,7 +51,7 @@ Return only valid JSON in exactly this shape:
 `.trim();
 }
 function buildSmartRepliesPrompt({ incomingMessage, context, style }) {
-return `
+  return `
 ROLE
 You are the smart reply engine inside a real-time chat application.
 GOAL
@@ -95,6 +95,6 @@ Return only valid JSON in exactly this shape:
 `.trim();
 }
 module.exports = {
-buildPredictiveTypingPrompt,
-buildSmartRepliesPrompt
+  buildPredictiveTypingPrompt,
+  buildSmartRepliesPrompt,
 };

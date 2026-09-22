@@ -13,7 +13,7 @@ const state = {
   predictiveRequestId: 0,
   smartReplyRequestId: 0,
   lastSenderKey: null,
-  lastMessageAt: 0
+  lastMessageAt: 0,
 };
 const GROUP_WINDOW_MS = 5 * 60 * 1000;
 const $ = (id) => document.getElementById(id);
@@ -27,7 +27,10 @@ function hashHue(input) {
   return hash % 360;
 }
 function initialsOf(name) {
-  const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+  const parts = String(name || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
   if (!parts.length) return "?";
   if (parts.length === 1) return parts[0].slice(0, 2);
   return `${parts[0][0]}${parts[1][0]}`;
@@ -51,7 +54,7 @@ function showToast(message, type = "success") {
 function authHeaders() {
   return {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${state.token}`
+    Authorization: `Bearer ${state.token}`,
   };
 }
 async function api(url, options = {}) {
@@ -59,8 +62,8 @@ async function api(url, options = {}) {
     ...options,
     headers: {
       ...authHeaders(),
-      ...(options.headers || {})
-    }
+      ...(options.headers || {}),
+    },
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.message || "Request failed");
@@ -121,7 +124,7 @@ async function requestPredictiveSuggestions() {
   try {
     const result = await api("/api/ai/predict", {
       method: "POST",
-      body: JSON.stringify({ roomId: state.currentRoom, draft })
+      body: JSON.stringify({ roomId: state.currentRoom, draft }),
     });
     if (requestId !== state.predictiveRequestId || draft !== $("messageInput").value.trim()) return;
     if (!result.enabled) {
@@ -146,7 +149,7 @@ async function requestSmartReplies(message) {
   try {
     const result = await api("/api/ai/smart-replies", {
       method: "POST",
-      body: JSON.stringify({ roomId, message: message.text })
+      body: JSON.stringify({ roomId, message: message.text }),
     });
     if (requestId !== state.smartReplyRequestId || roomId !== state.currentRoom) return;
     if (!result.enabled) {
@@ -221,7 +224,9 @@ function connectSocket() {
   });
 }
 function normalizeEmail(email) {
-  return String(email || "").trim().toLowerCase();
+  return String(email || "")
+    .trim()
+    .toLowerCase();
 }
 function createPersonalRoomId(emailA, emailB) {
   return [normalizeEmail(emailA), normalizeEmail(emailB)].sort().join("::");
@@ -229,8 +234,12 @@ function createPersonalRoomId(emailA, emailB) {
 
 /* ---------- mobile sidebar drawer ---------- */
 
-function openSidebar() { $("appView").classList.add("sidebar-open"); }
-function closeSidebar() { $("appView").classList.remove("sidebar-open"); }
+function openSidebar() {
+  $("appView").classList.add("sidebar-open");
+}
+function closeSidebar() {
+  $("appView").classList.remove("sidebar-open");
+}
 
 function switchPanel(panelId) {
   ["personalPanel", "groupPanel"].forEach((id) => {
@@ -272,7 +281,7 @@ function appendMessage(message) {
 
   const senderId = String(message.sender?._id || message.sender || "");
   const mine = senderId === String(state.user.id);
-  const senderName = mine ? "You" : (message.sender?.name || message.sender?.email || "User");
+  const senderName = mine ? "You" : message.sender?.name || message.sender?.email || "User";
   const timestamp = new Date(message.createdAt).getTime();
 
   const grouped = state.lastSenderKey === senderId && timestamp - state.lastMessageAt < GROUP_WINDOW_MS;
@@ -550,14 +559,18 @@ function selectMedia() {
 }
 function validateFiles(files) {
   const allowed = [
-    /^image\//, /^video\//, /^audio\//,
-    /^application\/pdf$/, /^application\/(zip|x-zip-compressed)$/,
-    /^text\/plain$/, /^application\/msword$/,
+    /^image\//,
+    /^video\//,
+    /^audio\//,
+    /^application\/pdf$/,
+    /^application\/(zip|x-zip-compressed)$/,
+    /^text\/plain$/,
+    /^application\/msword$/,
     /^application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.document$/,
     /^application\/vnd\.ms-excel$/,
     /^application\/vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet$/,
     /^application\/vnd\.ms-powerpoint$/,
-    /^application\/vnd\.openxmlformats-officedocument\.presentationml\.presentation$/
+    /^application\/vnd\.openxmlformats-officedocument\.presentationml\.presentation$/,
   ];
   if (files.length > state.maxFiles) throw new Error(`You can upload up to ${state.maxFiles} files at a time`);
   for (const file of files) {
@@ -581,12 +594,20 @@ function uploadOneFile(file, attempt = 1, onProgress = () => {}) {
     };
     xhr.onload = () => {
       let result = {};
-      try { result = JSON.parse(xhr.responseText || "{}"); } catch {}
+      try {
+        result = JSON.parse(xhr.responseText || "{}");
+      } catch {}
       if (xhr.status >= 200 && xhr.status < 300) return resolve(result);
       const retryable = xhr.status === 0 || xhr.status >= 500;
       if (retryable && attempt < MAX_ATTEMPTS) {
         const delay = 600 * attempt;
-        setTimeout(() => uploadOneFile(file, attempt + 1, onProgress).then(resolve).catch(reject), delay);
+        setTimeout(
+          () =>
+            uploadOneFile(file, attempt + 1, onProgress)
+              .then(resolve)
+              .catch(reject),
+          delay,
+        );
         return;
       }
       reject(new Error(result.message || `Upload failed (${xhr.status || "network error"})`));
@@ -594,7 +615,13 @@ function uploadOneFile(file, attempt = 1, onProgress = () => {}) {
     xhr.onerror = () => {
       if (attempt < MAX_ATTEMPTS) {
         const delay = 600 * attempt;
-        setTimeout(() => uploadOneFile(file, attempt + 1, onProgress).then(resolve).catch(reject), delay);
+        setTimeout(
+          () =>
+            uploadOneFile(file, attempt + 1, onProgress)
+              .then(resolve)
+              .catch(reject),
+          delay,
+        );
       } else {
         reject(new Error("Network error while uploading media"));
       }
@@ -631,7 +658,9 @@ async function uploadFiles(files) {
     state.uploading = false;
     $("mediaBtn").disabled = !state.currentRoom;
     $("sendBtn").disabled = !state.currentRoom;
-    setTimeout(() => { $("uploadStatus").textContent = ""; }, 3000);
+    setTimeout(() => {
+      $("uploadStatus").textContent = "";
+    }, 3000);
   }
 }
 async function uploadSelectedMedia() {
@@ -648,7 +677,7 @@ async function login(event) {
     const response = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ login: $("loginValue").value.trim(), password: $("loginPassword").value })
+      body: JSON.stringify({ login: $("loginValue").value.trim(), password: $("loginPassword").value }),
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.message);
@@ -672,8 +701,8 @@ async function signup(event) {
         name: $("signupName").value.trim(),
         email: $("signupEmail").value.trim(),
         phone: $("signupPhone").value.trim(),
-        password: $("signupPassword").value
-      })
+        password: $("signupPassword").value,
+      }),
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.message);
